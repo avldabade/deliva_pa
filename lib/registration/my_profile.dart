@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:deliva/home_screen/dashboard.dart';
+import 'package:deliva/login/login_options.dart';
 import 'package:deliva/podo/login_response.dart';
 import 'package:deliva/services/number_text_input_formator.dart';
 import 'package:deliva/podo/api_response.dart';
@@ -23,8 +25,9 @@ class MyProfile extends StatefulWidget {
   final String countryCode;
   final String mobileNo;
   final int userId;
+  final String from;
 
-  MyProfile(this.countryCode, this.mobileNo, this.userId, {Key key})
+  MyProfile(this.countryCode, this.mobileNo, this.userId, this.from, {Key key})
       : super(key: key);
 
   @override
@@ -72,6 +75,12 @@ class _MyProfileState extends State<MyProfile> {
   //  _formKey and _autoValidate
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
+
+  bool isPasswordError = false;
+
+  bool isNameError = false;
+  bool isEmailError = false;
+  bool isAddressError = false;
 
   /*AnimationController _animationController;
   Animation _animation;*/
@@ -208,6 +217,7 @@ class _MyProfileState extends State<MyProfile> {
                       ),
                     ),
                   ),
+                  //Container(height: 16.0,),
                   Expanded(
                     //color: Colors.red,
                     child: ListView(
@@ -238,7 +248,8 @@ class _MyProfileState extends State<MyProfile> {
                                     child: Text(
                                       StringValues.TEXT_PLZ_COMPLETE,
                                       style: TextStyle(
-                                        color: Color(ColorValues.accentColor),
+                                        color:
+                                            Color(ColorValues.text_view_theme),
                                         fontSize: 18.0,
                                         fontFamily: StringValues.customLight,
                                       ),
@@ -246,14 +257,20 @@ class _MyProfileState extends State<MyProfile> {
                                   ),
                                   Row(
                                     children: <Widget>[
-                                      Image(
-                                        image: new AssetImage(
-                                            'assets/images/phone_icon.png'),
-                                        width: 16.0,
-                                        height: 16.0,
-                                        //fit: BoxFit.fitHeight,
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 16.0),
+                                        child: Image(
+                                          image: new AssetImage(
+                                              'assets/images/phone_black.png'),
+                                          width: 16.0,
+                                          height: 16.0,
+                                          //fit: BoxFit.fitHeight,
+                                        ),
                                       ),
-                                      Container(width: 12.0,),
+                                      Container(
+                                        width: 12.0,
+                                      ),
                                       Expanded(
                                         child: TextFormField(
                                           controller: mobileNoController,
@@ -262,7 +279,8 @@ class _MyProfileState extends State<MyProfile> {
                                           maxLength: 13,
                                           enabled: false,
                                           inputFormatters: [
-                                            WhitelistingTextInputFormatter.digitsOnly,
+                                            WhitelistingTextInputFormatter
+                                                .digitsOnly,
                                             // Fit the validating format.
                                             //_phoneNumberFormatter,
                                           ],
@@ -272,8 +290,9 @@ class _MyProfileState extends State<MyProfile> {
                                           //autofocus: true,
                                           decoration: InputDecoration(
                                             counterText: '',
-                                            labelText: StringValues.TEXT_MOBILE_NO,
-                                            hintText: StringValues.TEXT_MOBILE_NO,
+                                            //labelText: StringValues.TEXT_MOBILE_NO,
+                                            hintText:
+                                                StringValues.TEXT_MOBILE_NO,
                                             border: InputBorder.none,
                                             /*errorText:
                                                                     submitFlag ? _validateEmail() : null,*/
@@ -286,109 +305,317 @@ class _MyProfileState extends State<MyProfile> {
                                     padding: const EdgeInsets.only(bottom: 0.0),
                                     child: new Container(
                                       height: 1.0,
-                                      color: Colors.grey,
+                                      color: Colors.black,
                                     ),
                                   ),
-                                  Row(
+                                  Stack(
                                     children: <Widget>[
-                                      Image(
-                                        image: new AssetImage(
-                                            'assets/images/password_ic.png'),
-                                        width: 16.0,
-                                        height: 16.0,
-                                        //fit: BoxFit.fitHeight,
-                                      ),
-                                      Container(width: 12.0,),
-                                      Expanded(
-                                        child: TextFormField(
-                                          controller: passwordController,
-                                          focusNode: _passwordFocus,
-                                          keyboardType: TextInputType.text,
-                                          inputFormatters: [
-                                            BlacklistingTextInputFormatter(
-                                                new RegExp('[\\ ]'))
-                                          ],
-                                          //to block space character
-                                          textInputAction: TextInputAction.next,
-                                          obscureText: true,
-                                          autofocus: true,
-                                          decoration: InputDecoration(
-                                            labelText: StringValues.TEXT_PASSWORD,
-                                            hintText: StringValues.TEXT_PASSWORD,
-                                            border: InputBorder.none,
-                                            //errorText: submitFlag ? _validateEmail() : null,
-                                          ),
-                                          onFieldSubmitted: (_) {
-                                            Utils.fieldFocusChange(context,
-                                                _passwordFocus, _fullNameFocus);
-                                          },
-                                          validator: Validation.validatePassword,
-                                          onSaved: (value) {
-                                            _password = value;
-                                          },
+                                      /*Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        child: Text(
+                                          StringValues.TEXT_NEW_PASSWORD,
+                                          style: TextStyle(
+                                              color: Color(
+                                                  ColorValues.primaryColor),
+                                              fontSize: 17.0),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 0.0),
-                                    child: new Container(
-                                      height: 1.0,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Image(
-                                        image: new AssetImage(
-                                            'assets/images/name_icon.png'),
-                                        width: 16.0,
-                                        height: 16.0,
-                                        //fit: BoxFit.fitHeight,
-                                      ),
-                                      Container(width: 12.0,),
-                                      Expanded(
-                                        child: TextFormField(
-                                          textCapitalization:
-                                              TextCapitalization.words,
-                                          controller: fullNameController,
-                                          focusNode: _fullNameFocus,
-                                          keyboardType: TextInputType.text,
-                                          /*inputFormatters: [
-                                WhitelistingTextInputFormatter.digitsOnly,
-                                // Fit the validating format.
-                              ],*/
-                                          //to block space character
-                                          textInputAction: TextInputAction.next,
+                                      ),*/
+                                      isPasswordError
+                                          ? Positioned(
+                                              right: 0.0,
+                                              bottom: 5.0,
+                                              //alignment: Alignment.bottomRight,
+                                              child: Image(
+                                                image: new AssetImage(
+                                                    'assets/images/error_icon_red.png'),
+                                                width: 16.0,
+                                                height: 16.0,
+                                                //fit: BoxFit.fitHeight,
+                                              ),
+                                            )
+                                          : Container(),
+                                      Theme(
+                                        data: Theme.of(context).copyWith(
+                                          primaryColor: Color(
+                                              ColorValues.text_view_theme),
+                                        ),
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 14.0),
+                                          child: SizedBox(
+                                            height: 65.0,
+                                            child: TextFormField(
+                                              controller: passwordController,
+                                              focusNode: _passwordFocus,
 
-                                          //autofocus: true,
-                                          decoration: InputDecoration(
-                                            labelText: StringValues.TEXT_FULL_NAME,
-                                            hintText: StringValues.TEXT_FULL_NAME,
-                                            border: InputBorder.none,
-                                            /*errorText:
-                                                                    submitFlag ? _validateEmail() : null,*/
+                                              keyboardType: TextInputType.text,
+                                              inputFormatters: [
+                                                BlacklistingTextInputFormatter(
+                                                    new RegExp('[\\ ]'))
+                                              ],
+                                              //to block space character
+                                              textInputAction:
+                                                  TextInputAction.next,
+                                              decoration: InputDecoration(
+                                                helperText: ' ',
+                                                //labelText: StringValues.TEXT_PASSWORD,
+                                                //contentPadding: EdgeInsets.all(0.0),
+                                                //errorStyle: TextStyle(),
+                                                prefixIcon: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 0.0),
+                                                  child: Transform.scale(
+                                                    scale: 0.65,
+                                                    child: IconButton(
+                                                      onPressed: () {},
+                                                      icon: new Image.asset(
+                                                          "assets/images/password_ic.png"),
+                                                    ),
+                                                  ),
+                                                ),
+                                                //icon: Icon(Icons.lock_outline),
+                                                suffixIcon: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 0.0),
+                                                  child: Transform.scale(
+                                                    scale: 0.65,
+                                                    child: IconButton(
+                                                      onPressed: _toggle,
+                                                      icon: Image.asset(_obscureText
+                                                          ? 'assets/images/eye.png'
+                                                          : 'assets/images/eye_cross.png'),
+                                                    ),
+                                                  ),
+                                                ),
+                                                counterText: '',
+                                                hintText:
+                                                    StringValues.TEXT_PASSWORD,
+                                                //hintStyle: TextStyle(),
+                                                //border: InputBorder.none,
+                                                focusedBorder:
+                                                    UnderlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color:
+                                                                Colors.grey)),
+                                                /*errorText:
+                                                                                submitFlag ? _validateEmail() : null,*/
+                                              ),
+
+                                              obscureText: _obscureText,
+                                              onFieldSubmitted: (_) {
+                                                Utils.fieldFocusChange(
+                                                    context,
+                                                    _passwordFocus,
+                                                    _fullNameFocus);
+                                              },
+                                              validator: (String arg) {
+                                                String val =
+                                                    Validation.validatePassword(
+                                                        arg);
+                                                //setState(() {
+                                                if (val != null)
+                                                  isPasswordError = true;
+                                                else
+                                                  isPasswordError = false;
+                                                //});
+                                                return val;
+                                              },
+
+                                              onSaved: (value) {
+                                                _password = value;
+                                              },
+                                            ),
                                           ),
-                                          onFieldSubmitted: (_) {
-                                            Utils.fieldFocusChange(
-                                                context, _fullNameFocus, _emailFocus);
-                                          },
-                                          validator: Validation.validateName,
-                                          onSaved: (value) {
-                                            _fullName = value;
-                                          },
                                         ),
                                       ),
                                     ],
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 0.0),
-                                    child: new Container(
-                                      height: 1.0,
-                                      color: Colors.grey,
-                                    ),
+                                  Stack(
+                                    children: <Widget>[
+                                      /*Positioned(
+                                        top:0,
+                                        left: 0,
+                                        child: Text(StringValues.TEXT_EMAIL,style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 17.0),),),*/
+                                      isNameError
+                                          ? Positioned(
+                                              right: 0.0,
+                                              bottom: 5.0,
+                                              //alignment: Alignment.bottomRight,
+                                              child: Image(
+                                                image: new AssetImage(
+                                                    'assets/images/error_icon_red.png'),
+                                                width: 16.0,
+                                                height: 16.0,
+                                                //fit: BoxFit.fitHeight,
+                                              ),
+                                            )
+                                          : Container(),
+                                      Theme(
+                                        data: Theme.of(context).copyWith(
+                                          primaryColor: Color(
+                                              ColorValues.text_view_theme),
+                                        ),
+                                        child: SizedBox(
+                                          height: 65.0,
+                                          child: TextFormField(
+                                            controller: fullNameController,
+                                            focusNode: _fullNameFocus,
+                                            keyboardType: TextInputType.text,
+                                            textInputAction:
+                                                TextInputAction.next,
+
+                                            //autofocus: true,
+                                            decoration: InputDecoration(
+                                              //contentPadding: EdgeInsets.all(0.0),
+                                              helperText: ' ',
+                                              prefixIcon: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(0.0),
+                                                child: Transform.scale(
+                                                  scale: 0.65,
+                                                  child: IconButton(
+                                                    onPressed: () {},
+                                                    icon: new Image.asset(
+                                                        "assets/images/name_icon.png"),
+                                                  ),
+                                                ),
+                                              ),
+                                              //icon: Icon(Icons.lock_outline),
+                                              counterText: '',
+                                              //labelText: StringValues.TEXT_FIRST_NAME,
+                                              hintText: StringValues
+                                                  .TEXT_FIRST_NAME,
+                                              //border: InputBorder.none,
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                          color:
+                                                              Colors.grey)),
+                                              /*errorText:
+                                                                              submitFlag ? _validateEmail() : null,*/
+                                            ),
+
+                                            onFieldSubmitted: (_) {
+                                              Utils.fieldFocusChange(
+                                                  context,
+                                                  _fullNameFocus,
+                                                  _emailFocus);
+                                            },
+                                            validator: (String arg) {
+                                              String val =
+                                                  Validation.validateName(
+                                                      arg);
+                                              //setState(() {
+                                              if (val != null)
+                                                isNameError = true;
+                                              else
+                                                isNameError = false;
+                                              //});
+                                              return val;
+                                            },
+                                            onSaved: (value) {
+                                              //print('email value:: $value');
+                                              _fullName = value;
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Row(
+                                  Stack(
+                                    children: <Widget>[
+                                      /*Positioned(
+                                        top:0,
+                                        left: 0,
+                                        child: Text(StringValues.TEXT_EMAIL,style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 17.0),),),*/
+                                      isEmailError
+                                          ? Positioned(
+                                              right: 0.0,
+                                              bottom: 5.0,
+                                              //alignment: Alignment.bottomRight,
+                                              child: Image(
+                                                image: new AssetImage(
+                                                    'assets/images/error_icon_red.png'),
+                                                width: 16.0,
+                                                height: 16.0,
+                                                //fit: BoxFit.fitHeight,
+                                              ),
+                                            )
+                                          : Container(),
+                                      Theme(
+                                        data: Theme.of(context).copyWith(
+                                          primaryColor: Color(
+                                              ColorValues.text_view_theme),
+                                        ),
+                                        child: SizedBox(
+                                          height: 65.0,
+                                          child: TextFormField(
+                                            controller: emailController,
+                                            focusNode: _emailFocus,
+                                            keyboardType:
+                                                TextInputType.emailAddress,
+                                            textInputAction:
+                                                TextInputAction.next,
+
+                                            //autofocus: true,
+                                            decoration: InputDecoration(
+                                              //contentPadding: EdgeInsets.all(0.0),
+                                              helperText: ' ',
+                                              prefixIcon: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(0.0),
+                                                child: Transform.scale(
+                                                  scale: 0.65,
+                                                  child: IconButton(
+                                                    onPressed: () {},
+                                                    icon: new Image.asset(
+                                                        "assets/images/email_icon.png"),
+                                                  ),
+                                                ),
+                                              ),
+                                              //icon: Icon(Icons.lock_outline),
+                                              counterText: '',
+                                              //labelText: StringValues.TEXT_EMAIL,
+                                              hintText:
+                                                  StringValues.TEXT_EMAIL,
+                                              //border: InputBorder.none,
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                          color:
+                                                              Colors.grey)),
+                                              /*errorText:
+                                                                              submitFlag ? _validateEmail() : null,*/
+                                            ),
+
+                                            onFieldSubmitted: (_) {
+                                              Utils.fieldFocusChange(context,
+                                                  _emailFocus, _addressFocus);
+                                            },
+                                            validator: (String arg) {
+                                              String val =
+                                                  Validation.isEmail(arg);
+                                              //setState(() {
+                                              if (val != null)
+                                                isEmailError = true;
+                                              else
+                                                isEmailError = false;
+                                              //});
+                                              return val;
+                                            },
+                                            onSaved: (value) {
+                                              //print('email value:: $value');
+                                              _email = value;
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  /*   Row(
                                     children: <Widget>[
                                       Image(
                                         image: new AssetImage(
@@ -403,11 +630,11 @@ class _MyProfileState extends State<MyProfile> {
                                           controller: emailController,
                                           focusNode: _emailFocus,
                                           keyboardType: TextInputType.emailAddress,
-                                          /*inputFormatters: [
+                                          */ /*inputFormatters: [
                                           WhitelistingTextInputFormatter.digitsOnly,
                                           // Fit the validating format.
                                           //_phoneNumberFormatter,
-                                        ],*/
+                                        ],*/ /*
                                           //to block space character
                                           textInputAction: TextInputAction.next,
 
@@ -416,8 +643,8 @@ class _MyProfileState extends State<MyProfile> {
                                             labelText: StringValues.TEXT_EMAIL,
                                             hintText: StringValues.TEXT_EMAIL,
                                             border: InputBorder.none,
-                                            /*errorText:
-                                                                    submitFlag ? _validateEmail() : null,*/
+                                            */ /*errorText:
+                                                                    submitFlag ? _validateEmail() : null,*/ /*
                                           ),
                                           onFieldSubmitted: (_) {
                                             Utils.fieldFocusChange(
@@ -437,8 +664,99 @@ class _MyProfileState extends State<MyProfile> {
                                       height: 1.0,
                                       color: Colors.grey,
                                       ),
+                                  ),*/
+                                  Stack(
+                                    children: <Widget>[
+                                      /*Positioned(
+                                        top:0,
+                                        left: 0,
+                                        child: Text(StringValues.TEXT_EMAIL,style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 17.0),),),*/
+                                      isAddressError
+                                          ? Positioned(
+                                              right: 0.0,
+                                              bottom: 5.0,
+                                              //alignment: Alignment.bottomRight,
+                                              child: Image(
+                                                image: new AssetImage(
+                                                    'assets/images/error_icon_red.png'),
+                                                width: 16.0,
+                                                height: 16.0,
+                                                //fit: BoxFit.fitHeight,
+                                              ),
+                                            )
+                                          : Container(),
+                                      Theme(
+                                        data: Theme.of(context).copyWith(
+                                          primaryColor: Color(
+                                              ColorValues.text_view_theme),
+                                        ),
+                                        child: SizedBox(
+                                          height: 65.0,
+                                          child: TextFormField(
+                                            controller: addressController,
+                                            focusNode: _addressFocus,
+                                            keyboardType: TextInputType.text,
+                                            textInputAction:
+                                                TextInputAction.done,
+
+                                            //autofocus: true,
+                                            decoration: InputDecoration(
+                                              //contentPadding: EdgeInsets.all(0.0),
+                                              helperText: ' ',
+                                              prefixIcon: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(0.0),
+                                                child: Transform.scale(
+                                                  scale: 0.65,
+                                                  child: IconButton(
+                                                    onPressed: () {},
+                                                    icon: new Image.asset(
+                                                        "assets/images/location_ic.png"),
+                                                  ),
+                                                ),
+                                              ),
+                                              //icon: Icon(Icons.lock_outline),
+                                              counterText: '',
+                                              //labelText: StringValues.TEXT_ADDRESS,
+                                              hintText:
+                                                  StringValues.TEXT_ADDRESS,
+                                              //border: InputBorder.none,
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                          color:
+                                                              Colors.grey)),
+                                              /*errorText:
+                                                                              submitFlag ? _validateEmail() : null,*/
+                                            ),
+
+                                            onFieldSubmitted: (_) {
+                                              _addressFocus.unfocus();
+                                              validateMyProfile();
+                                            },
+                                            validator: (String arg) {
+                                              String val =
+                                                  Validation.validateAddress(
+                                                      arg);
+                                              //setState(() {
+                                              if (val != null)
+                                                isAddressError = true;
+                                              else
+                                                isAddressError = false;
+                                              //});
+                                              return val;
+                                            },
+                                            onSaved: (value) {
+                                              //print('email value:: $value');
+                                              _address = value;
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Row(
+
+                                  /*Row(
                                     children: <Widget>[
                                       Image(
                                         image: new AssetImage(
@@ -454,11 +772,11 @@ class _MyProfileState extends State<MyProfile> {
                                           focusNode: _addressFocus,
                                           keyboardType: TextInputType.multiline,
                                           maxLines: null,
-                                          /*inputFormatters: [
+                                          */ /*inputFormatters: [
                                 WhitelistingTextInputFormatter.digitsOnly,
                                 // Fit the validating format.
                                 _phoneNumberFormatter,
-                              ],*/
+                              ],*/ /*
                                           //to block space character
                                           textInputAction: TextInputAction.done,
 
@@ -467,8 +785,8 @@ class _MyProfileState extends State<MyProfile> {
                                             labelText: StringValues.TEXT_ADDRESS,
                                             hintText: StringValues.TEXT_ADDRESS,
                                             border: InputBorder.none,
-                                            /*errorText:
-                                                                    submitFlag ? _validateEmail() : null,*/
+                                            */ /*errorText:
+                                                                    submitFlag ? _validateEmail() : null,*/ /*
                                           ),
                                           onFieldSubmitted: (value) {
                                             _addressFocus.unfocus();
@@ -489,14 +807,18 @@ class _MyProfileState extends State<MyProfile> {
                                       height: 1.0,
                                       color: Colors.grey,
                                     ),
+                                  ),*/
+                                  Container(
+                                    height: 10.0,
                                   ),
                                   GestureDetector(
                                     onTap: () async {
-                                      String currentLocation= await new Utils().getUserLocationNew();
+                                      String currentLocation = await new Utils()
+                                          .getUserLocationNew();
                                       setState(() {
-                                        addressController.text=currentLocation;
+                                        addressController.text =
+                                            currentLocation;
                                       });
-
                                     },
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
@@ -514,7 +836,8 @@ class _MyProfileState extends State<MyProfile> {
                                           child: Text(
                                             StringValues.TEXT_USE_CUR_LOC,
                                             style: TextStyle(
-                                              color: Color(ColorValues.primaryColor),
+                                              color: Color(
+                                                  ColorValues.primaryColor),
                                               fontSize: 15.0,
                                               fontFamily:
                                                   StringValues.customLight,
@@ -563,17 +886,11 @@ class _MyProfileState extends State<MyProfile> {
                 ],
               ),
               _isInProgress ? CommonWidgets.getLoader(context) : Container(),
+              //WillPopScope(child: Container(), onWillPop: onBackPressed),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  void _navigateToRegistration() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => Registration()),
     );
   }
 
@@ -749,6 +1066,7 @@ class _MyProfileState extends State<MyProfile> {
     setState(() {
       _isInProgress = true;
     });
+    print('widget.userId::: ${widget.userId}');
     Map<String, dynamic> requestJson = {
       "address": _address,
       "email": _email,
@@ -766,10 +1084,13 @@ class _MyProfileState extends State<MyProfile> {
       "userId": widget.userId
     };*/
     print("requestJson::: ${requestJson}");
+    String access_token = await SharedPreferencesHelper.getPrefString(
+        SharedPreferencesHelper.ACCESS_TOKEN);
     //Map<String, dynamic> requestJson1 = {"mobile": "7000543895"};
     Map<String, String> headers = {
       'Content-type': 'application/json',
       'Accept': 'application/json',
+      'Authorization': 'bearer $access_token'
     };
     String dataURL =
         Constants.BASE_URL + Constants.REGISTRATION_PROFILE_STEP2_API;
@@ -799,10 +1120,15 @@ class _MyProfileState extends State<MyProfile> {
           //.isRegistrationComplete == "false"){
           //_navigateToRegistrationOtp();
           print("Registration Successfull!!!");
-          Toast.show("Registration Successfull!!!", context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+          /*Toast.show("Registration Successfull!!!", context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);*/
           //_navigateToLogin();
-          callLoginApi();
+          //callLoginApi();
+
+          SharedPreferencesHelper.setPrefString(
+              SharedPreferencesHelper.NAME, _fullName);
+
+          _performLogin();
         } else if (apiResponse.status == 500) {
           print(apiResponse.message);
           Toast.show("${apiResponse.message}", context,
@@ -835,16 +1161,27 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
-  /*void _navigateToLogin() {
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil('/loginOptions', (Route<dynamic> route) => false);
-  }*/
+  Future _performLogin() async {
+    // This is just a demo, so no actual login here.
+    //_saveLoginState();
+    //if(widget.from == 'Dashboard'){
+    SharedPreferencesHelper.setPrefBool(
+        SharedPreferencesHelper.IS_PROFILE_COMPLETE, true);
+    //}
 
-  /* void fieldFocusChange(BuildContext context, FocusNode currentFocus,
-      FocusNode nextFocus) {
-    currentFocus.unfocus();
-    FocusScope.of(context).requestFocus(nextFocus);
-  }*/
+    /*final result =
+    await Navigator.of(context).pushReplacementNamed('/dashboard');*/
+    return Navigator.of(context)
+        .pushNamedAndRemoveUntil('/dashboard', (Route<dynamic> route) => false);
+
+    /*final resultData = await Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Dashboard()),
+    );*/
+    print('_performLogin belo push');
+    //Navigator.of(context).pop(Constants.popScreen);
+    print('_performLogin belo pop');
+  }
 
   void _validateInputs() {
     if (_formKey.currentState.validate()) {
@@ -862,7 +1199,16 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
-  void callLoginApi() async {
+  Future<bool> onBackPressed() async {
+    print('onBackPressed called');
+    //Navigator.of(context).pop(Constants.popScreen);
+    /*final resultData = await Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginOptions()),
+    );*/
+    return true;
+  }
+/*void callLoginApi() async {
     String encodedPassword = Utils.encodeStringToBase64(_password);
     print("login _password::: $_password \n_email:: $_email \n_countryCode::: ${widget.countryCode} ");
     print("login encodedPassword::: $encodedPassword");
@@ -974,14 +1320,5 @@ class _MyProfileState extends State<MyProfile> {
       });
       _isSubmitPressed = false;
     }
-  }
-  Future _performLogin() async {
-    // This is just a demo, so no actual login here.
-    //_saveLoginState();
-    final result =
-    await Navigator.of(context).pushReplacementNamed('/dashboard');
-    setState(() {
-      print('result:::: $result');
-    });
-  }
+  }*/
 }

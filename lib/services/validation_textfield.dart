@@ -9,6 +9,7 @@ class Validation {
     RegExp regExp = RegExp(emailRegexp);
 
     if (regExp.hasMatch(em)) {
+      
       return null;
     } else {
       return StringValues.ENTER_VALID_EMAIL;

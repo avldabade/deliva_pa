@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -40,10 +41,14 @@ class _ForgotOTPState extends State<ForgotOTP> {
 
   bool _isSubmitPressed=false;
 
+  Timer _timer;
+  int _start = Constants.OTP_TIMER;
+
   @override
   void dispose() {
     // TODO: implement dispose
     controller.dispose();
+    _timer.cancel();
     super.dispose();
   }
 @override
@@ -51,6 +56,24 @@ class _ForgotOTPState extends State<ForgotOTP> {
     // TODO: implement initState
     super.initState();
 
+    startTimer();
+
+  }
+
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+      oneSec,
+          (Timer timer) => setState(
+            () {
+          if (_start < 1) {
+            timer.cancel();
+          } else {
+            _start = _start - 1;
+          }
+        },
+      ),
+    );
   }
 
   @override
@@ -153,17 +176,24 @@ class _ForgotOTPState extends State<ForgotOTP> {
                                         fontSize: 16.0),
                                   ),
                                 ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top:40.0,bottom: 30.0),
+                                  child: Text('$_start ${StringValues.sec}',
+                                    style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 20.0,fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+
                                 PinCodeTextField(
                                   autofocus: false,
                                   pinBoxWidth: 35.0,
                                   controller: controller,
                                   hideCharacter: false,
                                   highlight: true,
-                                  highlightColor: Color(ColorValues.yellow_light),
+                                  highlightColor: Color(ColorValues.grey_light_divider),
                                   //Colors.blue,
-                                  defaultBorderColor: Color(ColorValues.grey_hint_color),
+                                  defaultBorderColor: Color(ColorValues.grey_light_divider),//text_view_hint
                                   //Colors.black,
-                                  hasTextBorderColor: Color(ColorValues.grey_hint_color),
+                                  hasTextBorderColor: Color(ColorValues.grey_light_divider),
                                   //Colors.green,
                                   errorBorderColor: Color(ColorValues.text_red),
                                   maxLength: pinLength,
@@ -190,13 +220,31 @@ class _ForgotOTPState extends State<ForgotOTP> {
                                 ),
                                 Visibility(
                                   child: Text(
-                                    "Wrong PIN!",
+                                    StringValues.wrongOTP,
                                     style: TextStyle(color: Colors.red),
                                   ),
                                   visible: hasError,
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.only(bottom: 30.0),
+                                  padding: const EdgeInsets.only(bottom: 20.0),
+                                ),
+
+                                GestureDetector(
+                                  onTap: () {
+                                    if(_start == 0){
+                                      callGetGenerateOtpApi();
+                                    }
+                                  },
+                                  child: Text(
+                                    StringValues.TEXT_RESEND_CODE,
+                                    style: TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      color: _start != 0 ? Color(ColorValues.text_view_hint) : Color(ColorValues.blueTheme),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 40.0),
                                 ),
                                 SizedBox(
                                   width: 250.0,
@@ -218,21 +266,7 @@ class _ForgotOTPState extends State<ForgotOTP> {
                                     ),
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 40.0),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    callGetGenerateOtpApi();
-                                  },
-                                  child: Text(
-                                    StringValues.TEXT_RESEND_CODE,
-                                    style: TextStyle(
-                                      decoration: TextDecoration.underline,
-                                      color: Color(ColorValues.sea_blue),
-                                    ),
-                                  ),
-                                )
+
                               ],
                             ),
                           ),
@@ -281,7 +315,7 @@ class _ForgotOTPState extends State<ForgotOTP> {
       //final jsonResponse = json.decode(response.body);
       print('jsonResponse::::: ${jsonResponseMap.toString()}');
       //ResponsePodo responsePodo = new ResponsePodo.fromJson(jsonResponseMap);
-      ResponsePodo apiResponse = new ResponsePodo.fromJson(jsonResponseMap);
+      APIResponse apiResponse = new APIResponse.fromJson(jsonResponseMap);
       print("apiResponse.responseMessage:: ${apiResponse.responseMessage}");
 
       if (response.statusCode == 200) {
@@ -289,7 +323,9 @@ class _ForgotOTPState extends State<ForgotOTP> {
 
         if (apiResponse.status == 200) {
           //_navigateToForgotOTP();
-          Toast.show("${apiResponse.message}", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
+          Toast.show("${apiResponse.responseMessage}", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
+          _start=Constants.OTP_TIMER;
+          startTimer();
         }else if (apiResponse.status == 404) {
           print("${apiResponse.message}");
           Toast.show("${apiResponse.message}", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);

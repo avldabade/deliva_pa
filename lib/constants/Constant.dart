@@ -15,6 +15,12 @@ class Constants {
   static const String FORGOT_PASSWORD_VERIFY_OTP_API = "user/user/validateOtp";
   static const String RESET_PASSWORD_API = "user/user/resetPassword";
   static const String PA_LOCATION_API = "request/deliveryRequest/getAllProcessingAgentByLocation";
+
+  //for delivery request listing
+  static const String published_draft_delivery_request_API = "request/deliveryRequest/getAllRequestByCustomerStatus";
+  static const String active_delivery_request_API = "request/deliveryRequest/getAllActiveRequest";
+  static const String delivery_request_detail_API = "request/deliveryRequest/details";
+
   static const String CREATE_DELIVERY_REQ_API = "request/deliveryRequest/create";
   static const String MEDIA_UPLOAD_API = "request/deliveryRequest/mediaUrl/update";
   static const String MEDIA_UPLOAD_URL = "https://deliva-request-image-full.s3.amazonaws.com/";
@@ -31,14 +37,15 @@ class Constants {
   static const String loginByMobile  = "mobile";
   static const String loginByEmail  = "email";
 
-
-
-
   static const int SERVICE_TIME_OUT = 30000;
 
   static const int CONNECTION_TIME_OUT = 30000;
+  static const int OTP_TIMER = 25;
 
   static final String ERROR_LOGIN = "Please enter correct mobile no. and password";
-  static final String TEXT_SERVER_EXCEPTION = 'Please try again in sometime';//'Somthing went wrong, Please try again later.';
+  static final String TEXT_SERVER_EXCEPTION = 'Please try again in sometime';
+
+  static final int popScreen=1;//'Somthing went wrong, Please try again later.';
+  static final int popSingleScreen=2;//'Somthing went wrong, Please try again later.';
 
 }

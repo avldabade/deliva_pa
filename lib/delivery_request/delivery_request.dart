@@ -69,13 +69,13 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
   final widthController = TextEditingController();
   final FocusNode _widthFocus = FocusNode();
 
-  bool _checkedLocFixedValue = true;
-  bool _checkedInsValue = true;
-  bool _checkedTCValue = true;
+  bool _checkedLocFixedValue = false;
+  bool _checkedInsValue = false;
+  bool _checkedTCValue = false;
 
-  String _weight="", _value="";
-  String _width="", _height="";
-  String _length="";
+  String _weight = "", _value = "";
+  String _width = "", _height = "";
+  String _length = "";
 
   File _imagePath;
 
@@ -105,11 +105,12 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
 
   //LIst for weightUnit dropdown
   List<String> wUnitList = [
-    "LBS",
-    "KG",
-    "GRAM",
+    StringValues.LBS,
+    StringValues.KG,
+    StringValues.GRAM,
   ];
-  String weightUnit = 'LBS';
+  String weightUnit = StringValues.LBS;
+  String preWeightUnit = '';
 
   bool hasSourceError = false, hasDestinationError = false;
 
@@ -127,17 +128,23 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
 
   String access_token;
 
+  bool isTitleError=false;
+  bool isLengthError=false;
+  bool isWidthError=false;
+  bool isHeightError=false;
+  bool isWeightError=false;
+  bool isDescError=false;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    new Utils().getUserLocationNew();
-    //getDimenUnit();
     inchBgColor = Color(ColorValues.primaryColor);
     inchTextColor = Color(ColorValues.white);
     cmBgColor = Color(ColorValues.white);
     cmTextColor = Color(ColorValues.primaryColor);
     getAsyncData();
+    weightController.addListener(() {});
   }
 
   @override
@@ -362,27 +369,44 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                                             ),
                                                           ),
                                                         ),
-                                                        Visibility(
-                                                          child: Text(
-                                                            "Select Source",
-                                                            style: TextStyle(
-                                                                color:
-                                                                    Colors.red),
-                                                          ),
-                                                          visible:
-                                                              hasSourceError,
+                                                        Stack(
+                                                          children: <Widget>[
+                                                            Padding(
+                                                              padding:
+                                                              const EdgeInsets.only(bottom: 10.0),
+                                                              child: new Container(
+                                                                height: 1.0,
+                                                                color: hasSourceError?Color(ColorValues.error_red) :Colors.grey,
+                                                              ),
+                                                            ),
+                                                            Visibility(
+                                                              child: Align(
+                                                                alignment: Alignment.centerLeft,
+                                                                child: Padding(
+                                                                  padding: const EdgeInsets.only(top:5.0),
+                                                                  child: Text(
+                                                                    StringValues.source_error,
+                                                                    style: TextStyle(color: Color(ColorValues.error_red),fontSize: 12.0),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              visible: hasSourceError,
+                                                            ),
+                                                            hasSourceError ? Positioned(
+                                                              right: 0.0,
+                                                              bottom: 0.0,
+                                                              //alignment: Alignment.bottomRight,
+                                                              child: Image(
+                                                                image: new AssetImage(
+                                                                    'assets/images/error_icon_red.png'),
+                                                                width: 16.0,
+                                                                height: 16.0,
+                                                                //fit: BoxFit.fitHeight,
+                                                              ),
+                                                            ):Container(),
+                                                          ],
                                                         ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .only(
-                                                                  bottom: 0.0),
-                                                          child: new Container(
-                                                            height: 1.0,
-                                                            color: Colors.grey,
-                                                            //width: MediaQuery.of(context).size.width - 75,
-                                                          ),
-                                                        ),
+
                                                         GestureDetector(
                                                           onTap: () {
                                                             print(
@@ -423,26 +447,43 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                                             ),
                                                           ),
                                                         ),
-                                                        Visibility(
-                                                          child: Text(
-                                                            "Select Destination",
-                                                            style: TextStyle(
-                                                                color:
-                                                                    Colors.red),
-                                                          ),
-                                                          visible:
-                                                              hasDestinationError,
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .only(
-                                                                  bottom: 0.0),
-                                                          child: new Container(
-                                                            height: 1.0,
-                                                            color: Colors.grey,
-                                                            //width: MediaQuery.of(context).size.width - 75,
-                                                          ),
+
+                                                        Stack(
+                                                          children: <Widget>[
+                                                            Padding(
+                                                              padding:
+                                                              const EdgeInsets.only(bottom: 10.0),
+                                                              child: new Container(
+                                                                height: 1.0,
+                                                                color: hasDestinationError?Color(ColorValues.error_red) :Colors.grey,
+                                                              ),
+                                                            ),
+                                                            Visibility(
+                                                              child: Align(
+                                                                alignment: Alignment.centerLeft,
+                                                                child: Padding(
+                                                                  padding: const EdgeInsets.only(top:5.0),
+                                                                  child: Text(
+                                                                    StringValues.destination_error,
+                                                                    style: TextStyle(color: Color(ColorValues.error_red),fontSize: 12.0),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              visible: hasDestinationError,
+                                                            ),
+                                                            hasDestinationError ? Positioned(
+                                                              right: 0.0,
+                                                              bottom: 0.0,
+                                                              //alignment: Alignment.bottomRight,
+                                                              child: Image(
+                                                                image: new AssetImage(
+                                                                    'assets/images/error_icon_red.png'),
+                                                                width: 16.0,
+                                                                height: 16.0,
+                                                                //fit: BoxFit.fitHeight,
+                                                              ),
+                                                            ):Container(),
+                                                          ],
                                                         ),
                                                       ],
                                                     ),
@@ -498,10 +539,10 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                                                         const EdgeInsets.all(
                                                                             0.0),
                                                                     child: Text(
-                                                                      '0.4 Mile',
+                                                                      sourceData.distance,
                                                                       style: TextStyle(
                                                                           color: Color(ColorValues
-                                                                              .accentColor),
+                                                                              .blueTheme),
                                                                           fontSize:
                                                                               16.0),
                                                                     ),
@@ -534,7 +575,7 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                                                         child:
                                                                             Text(
                                                                           sourceData
-                                                                              .email,
+                                                                              .businessName,
                                                                           style:
                                                                               TextStyle(
                                                                             fontSize:
@@ -681,29 +722,42 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                                                 ),
                                                               ),
                                                             ),
-                                                            Visibility(
-                                                              child: Text(
-                                                                "Select Source",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .red),
-                                                              ),
-                                                              visible:
-                                                                  hasSourceError,
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .only(
-                                                                      bottom:
-                                                                          0.0),
-                                                              child:
-                                                                  new Container(
-                                                                height: 1.0,
-                                                                color:
-                                                                    Colors.grey,
-                                                                //width: MediaQuery.of(context).size.width - 75,
-                                                              ),
+                                                            Stack(
+                                                              children: <Widget>[
+                                                                Padding(
+                                                                  padding:
+                                                                  const EdgeInsets.only(bottom: 10.0),
+                                                                  child: new Container(
+                                                                    height: 1.0,
+                                                                    color: hasSourceError?Color(ColorValues.error_red) :Colors.grey,
+                                                                  ),
+                                                                ),
+                                                                Visibility(
+                                                                  child: Align(
+                                                                    alignment: Alignment.centerLeft,
+                                                                    child: Padding(
+                                                                      padding: const EdgeInsets.only(top:5.0),
+                                                                      child: Text(
+                                                                        StringValues.source_error,
+                                                                        style: TextStyle(color: Color(ColorValues.error_red),fontSize: 12.0),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  visible: hasSourceError,
+                                                                ),
+                                                                hasSourceError ? Positioned(
+                                                                  right: 0.0,
+                                                                  bottom: 0.0,
+                                                                  //alignment: Alignment.bottomRight,
+                                                                  child: Image(
+                                                                    image: new AssetImage(
+                                                                        'assets/images/error_icon_red.png'),
+                                                                    width: 16.0,
+                                                                    height: 16.0,
+                                                                    //fit: BoxFit.fitHeight,
+                                                                  ),
+                                                                ):Container(),
+                                                              ],
                                                             ),
                                                           ],
                                                         ),
@@ -757,10 +811,10 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                                                         const EdgeInsets.all(
                                                                             0.0),
                                                                     child: Text(
-                                                                      '0.4 Mile',
+                                                                      destinationData.distance,
                                                                       style: TextStyle(
                                                                           color: Color(ColorValues
-                                                                              .accentColor),
+                                                                              .blueTheme),
                                                                           fontSize:
                                                                               16.0),
                                                                     ),
@@ -793,7 +847,7 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                                                         child:
                                                                             Text(
                                                                           destinationData
-                                                                              .email,
+                                                                              .businessName,
                                                                           style:
                                                                               TextStyle(
                                                                             fontSize:
@@ -940,29 +994,42 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                                                 ),
                                                               ),
                                                             ),
-                                                            Visibility(
-                                                              child: Text(
-                                                                "Select Destination",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .red),
-                                                              ),
-                                                              visible:
-                                                                  hasDestinationError,
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .only(
-                                                                      bottom:
-                                                                          0.0),
-                                                              child:
-                                                                  new Container(
-                                                                height: 1.0,
-                                                                color:
-                                                                    Colors.grey,
-                                                                //width: MediaQuery.of(context).size.width - 75,
-                                                              ),
+                                                            Stack(
+                                                              children: <Widget>[
+                                                                Padding(
+                                                                  padding:
+                                                                  const EdgeInsets.only(bottom: 10.0),
+                                                                  child: new Container(
+                                                                    height: 1.0,
+                                                                    color: hasDestinationError?Color(ColorValues.error_red) :Colors.grey,
+                                                                  ),
+                                                                ),
+                                                                Visibility(
+                                                                  child: Align(
+                                                                    alignment: Alignment.centerLeft,
+                                                                    child: Padding(
+                                                                      padding: const EdgeInsets.only(top:5.0),
+                                                                      child: Text(
+                                                                        StringValues.destination_error,
+                                                                        style: TextStyle(color: Color(ColorValues.error_red),fontSize: 12.0),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  visible: hasDestinationError,
+                                                                ),
+                                                                hasDestinationError ? Positioned(
+                                                                  right: 0.0,
+                                                                  bottom: 0.0,
+                                                                  //alignment: Alignment.bottomRight,
+                                                                  child: Image(
+                                                                    image: new AssetImage(
+                                                                        'assets/images/error_icon_red.png'),
+                                                                    width: 16.0,
+                                                                    height: 16.0,
+                                                                    //fit: BoxFit.fitHeight,
+                                                                  ),
+                                                                ):Container(),
+                                                              ],
                                                             ),
                                                           ],
                                                         ),
@@ -1030,35 +1097,91 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                     padding:
                                         const EdgeInsets.only(bottom: 20.0),
                                   ),
-                                  TextFormField(
-                                    controller: titleController,
-                                    focusNode: _titleFocus,
-                                    keyboardType: TextInputType.text,
-                                    //enabled: false,
-                                    //to block space character
-                                    textInputAction: TextInputAction.next,
-                                    //autofocus: true,
-                                    decoration: InputDecoration(
-                                      labelText: StringValues.title,
-                                      hintText: StringValues.title,
-                                      border: InputBorder.none,
-                                    ),
-                                    validator: Validation.validateTextField,
-                                    onSaved: (value) {
-                                      _title = value;
-                                    },
-                                    onFieldSubmitted: (_) {
-                                      Utils.fieldFocusChange(
-                                          context, _titleFocus, _lengthFocus);
-                                    },
+                                  Stack(
+                                    children: <Widget>[
+                                      Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        child: Text(
+                                          StringValues
+                                              .title,
+                                          style: TextStyle(
+                                              color: Color(
+                                                  ColorValues
+                                                      .text_view_theme),
+                                              fontSize: 17.0),
+                                        ),
+                                      ),
+                                      isTitleError
+                                          ? Positioned(
+                                        right: 0.0,
+                                        bottom: 5.0,
+                                        //alignment: Alignment.bottomRight,
+                                        child: Image(
+                                          image: new AssetImage(
+                                              'assets/images/error_icon_red.png'),
+                                          width: 16.0,
+                                          height: 16.0,
+                                          //fit: BoxFit.fitHeight,
+                                        ),
+                                      )
+                                          : Container(),
+                                      Theme(
+                                        data: Theme.of(context).copyWith(
+                                          primaryColor: Color(
+                                              ColorValues.text_view_theme),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(top:12.0),
+                                          child: SizedBox(
+                                            height: 65.0,
+                                            child: TextFormField(
+                                              controller: titleController,
+                                              focusNode: _titleFocus,
+                                              keyboardType: TextInputType.text,
+                                              //enabled: false,
+                                              //to block space character
+                                              textInputAction: TextInputAction.next,
+                                              //autofocus: true,
+                                              decoration: InputDecoration(
+                                                //labelText: StringValues.title,
+                                                helperText: ' ',
+                                                //hintText: StringValues.title,
+                                                //border: InputBorder.none,
+                                              ),
+                                              //validator: Validation.validateTextField,
+                                              validator:
+                                                  (String arg) {
+                                                String val =
+                                                Validation
+                                                    .validateTextField(
+                                                    arg);
+                                                //setState(() {
+                                                if (val != null)
+                                                  isTitleError =
+                                                  true;
+                                                else
+                                                  isTitleError =
+                                                  false;
+                                                //});
+                                                return val;
+                                              },
+                                              onSaved: (value) {
+                                                _title = value;
+                                              },
+                                              onFieldSubmitted: (_) {
+                                                Utils.fieldFocusChange(
+                                                    context, _titleFocus, _lengthFocus);
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 20.0),
-                                    child: new Container(
-                                      height: 1.0,
-                                      color: Colors.grey,
-                                    ),
+                                  Container(
+                                    height: 20.0,
+
                                   ),
                                   Center(
                                     child: Padding(
@@ -1158,72 +1281,126 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                         child: Padding(
                                           padding:
                                               const EdgeInsets.only(right: 8.0),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                          child: Stack(
                                             children: <Widget>[
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Image(
-                                                    image: new AssetImage(
-                                                        'assets/images/length.png'),
-                                                    width: 20.0,
-                                                    height: 20.0,
-                                                    //fit: BoxFit.fitHeight,
-                                                  ),
-                                                  Container(
-                                                    width: 8.0,
-                                                  ),
-                                                  Expanded(
-                                                    child: TextFormField(
+                                              /*Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        child: Text(
+                                          StringValues
+                                          .weight,
+                                          style: TextStyle(
+                                          color: Color(
+                                              ColorValues
+                                                  .text_view_theme),
+                                          fontSize: 14.0),
+                                        ),
+                                      ),*/
+                                              isLengthError
+                                                  ? Positioned(
+                                                right: 0.0,
+                                                bottom: 5.0,
+                                                //alignment: Alignment.bottomRight,
+                                                child: Image(
+                                                  image: new AssetImage(
+                                                      'assets/images/error_icon_red.png'),
+                                                  width: 16.0,
+                                                  height: 16.0,
+                                                  //fit: BoxFit.fitHeight,
+                                                ),
+                                              )
+                                                  : Container(),
+                                              Theme(
+                                                data: Theme.of(context)
+                                                    .copyWith(
+                                                  primaryColor: Color(
+                                                      ColorValues
+                                                          .text_view_theme),
+                                                ),
+                                                child: Padding(
+                                                  padding:
+                                                  const EdgeInsets
+                                                      .only(
+                                                      top: 16.0),
+                                                  child: SizedBox(
+                                                    height: 65.0,
+                                                    child:
+                                                    TextFormField(
                                                       controller:
-                                                          lengthController,
+                                                      lengthController,
                                                       focusNode: _lengthFocus,
                                                       keyboardType:
-                                                          TextInputType.number,
+                                                      TextInputType.number,
                                                       //to block space character
                                                       textInputAction:
-                                                          TextInputAction.next,
+                                                      TextInputAction.next,
+
+                                                      //autofocus: true,
                                                       decoration:
-                                                          InputDecoration(
-                                                        labelText:
-                                                            StringValues.length,
-                                                        hintText:
-                                                            StringValues.length,
-                                                        border:
-                                                            InputBorder.none,
-                                                        //errorText: submitFlag ? _validateEmail() : null,
+                                                      InputDecoration(
+                                                        //contentPadding: EdgeInsets.all(0.0),
+                                                        helperText: ' ',
+                                                        prefixIcon:
+                                                        Padding(
+                                                          padding:
+                                                          const EdgeInsets
+                                                              .all(
+                                                              0.0),
+                                                          child:
+                                                          Transform
+                                                              .scale(
+                                                            scale: 0.65,
+                                                            child:
+                                                            IconButton(
+                                                              onPressed:
+                                                                  () {},
+                                                              icon: new Image
+                                                                  .asset(
+                                                                  "assets/images/length.png"),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        //icon: Icon(Icons.lock_outline),
+                                                        counterText: '',
+                                                        //labelText: StringValues.TEXT_EMAIL,
+                                                        hintText:StringValues.length,
+                                                        //border: InputBorder.none,
+                                                        focusedBorder: UnderlineInputBorder(
+                                                            borderSide:
+                                                            BorderSide(
+                                                                color:
+                                                                Colors.grey)),
+                                                        /*errorText:
+                                                                            submitFlag ? _validateEmail() : null,*/
                                                       ),
+
+                                                      validator:
+                                                          (String arg) {
+                                                        String val =
+                                                        Validation
+                                                            .validateTextField(
+                                                            arg);
+                                                        //setState(() {
+                                                        if (val != null)
+                                                          isLengthError =
+                                                          true;
+                                                        else
+                                                          isLengthError =
+                                                          false;
+                                                        //});
+                                                        return val;
+                                                      },
                                                       onFieldSubmitted: (_) {
                                                         Utils.fieldFocusChange(
                                                             context,
                                                             _lengthFocus,
                                                             _widthFocus);
                                                       },
-                                                      validator: Validation
-                                                          .validateTextField,
-                                                      /*(value){
-                                                        print('field name:: ${StringValues.length} value:: $value');
-                                                        Validation.validateTextField(StringValues.length,value);
-                                                      },*/
-
                                                       onSaved: (value) {
                                                         _length = value;
                                                       },
                                                     ),
                                                   ),
-                                                ],
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    bottom: 0.0),
-                                                child: new Container(
-                                                  height: 1.0,
-                                                  color: Colors.grey,
                                                 ),
                                               ),
                                             ],
@@ -1234,67 +1411,126 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                         child: Padding(
                                           padding: const EdgeInsets.only(
                                               left: 4.0, right: 4.0),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                          child: Stack(
                                             children: <Widget>[
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Image(
-                                                    image: new AssetImage(
-                                                        'assets/images/width.png'),
-                                                    width: 20.0,
-                                                    height: 20.0,
-                                                    //fit: BoxFit.fitHeight,
-                                                  ),
-                                                  Container(
-                                                    width: 8.0,
-                                                  ),
-                                                  Expanded(
-                                                    child: TextFormField(
+                                              /*Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        child: Text(
+                                          StringValues
+                                          .weight,
+                                          style: TextStyle(
+                                          color: Color(
+                                              ColorValues
+                                                  .text_view_theme),
+                                          fontSize: 14.0),
+                                        ),
+                                      ),*/
+                                              isWidthError
+                                                  ? Positioned(
+                                                right: 0.0,
+                                                bottom: 5.0,
+                                                //alignment: Alignment.bottomRight,
+                                                child: Image(
+                                                  image: new AssetImage(
+                                                      'assets/images/error_icon_red.png'),
+                                                  width: 16.0,
+                                                  height: 16.0,
+                                                  //fit: BoxFit.fitHeight,
+                                                ),
+                                              )
+                                                  : Container(),
+                                              Theme(
+                                                data: Theme.of(context)
+                                                    .copyWith(
+                                                  primaryColor: Color(
+                                                      ColorValues
+                                                          .text_view_theme),
+                                                ),
+                                                child: Padding(
+                                                  padding:
+                                                  const EdgeInsets
+                                                      .only(
+                                                      top: 16.0),
+                                                  child: SizedBox(
+                                                    height: 65.0,
+                                                    child:
+                                                    TextFormField(
                                                       controller:
-                                                          widthController,
+                                                      widthController,
                                                       focusNode: _widthFocus,
                                                       keyboardType:
-                                                          TextInputType.number,
+                                                      TextInputType.number,
                                                       //to block space character
                                                       textInputAction:
-                                                          TextInputAction.next,
+                                                      TextInputAction.next,
+
+                                                      //autofocus: true,
                                                       decoration:
-                                                          InputDecoration(
-                                                        labelText:
-                                                            StringValues.width,
-                                                        hintText:
-                                                            StringValues.width,
-                                                        border:
-                                                            InputBorder.none,
-                                                        //errorText: submitFlag ? _validateEmail() : null,
+                                                      InputDecoration(
+                                                        //contentPadding: EdgeInsets.all(0.0),
+                                                        helperText: ' ',
+                                                        prefixIcon:
+                                                        Padding(
+                                                          padding:
+                                                          const EdgeInsets
+                                                              .all(
+                                                              0.0),
+                                                          child:
+                                                          Transform
+                                                              .scale(
+                                                            scale: 0.65,
+                                                            child:
+                                                            IconButton(
+                                                              onPressed:
+                                                                  () {},
+                                                              icon: new Image
+                                                                  .asset(
+                                                                  "assets/images/width.png"),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        //icon: Icon(Icons.lock_outline),
+                                                        counterText: '',
+                                                        //labelText: StringValues.TEXT_EMAIL,
+                                                        hintText:StringValues.width,
+                                                        //border: InputBorder.none,
+                                                        focusedBorder: UnderlineInputBorder(
+                                                            borderSide:
+                                                            BorderSide(
+                                                                color:
+                                                                Colors.grey)),
+                                                        /*errorText:
+                                                                            submitFlag ? _validateEmail() : null,*/
                                                       ),
+
+                                                      validator:
+                                                          (String arg) {
+                                                        String val =
+                                                        Validation
+                                                            .validateTextField(
+                                                            arg);
+                                                        //setState(() {
+                                                        if (val != null)
+                                                          isWidthError =
+                                                          true;
+                                                        else
+                                                          isWidthError =
+                                                          false;
+                                                        //});
+                                                        return val;
+                                                      },
                                                       onFieldSubmitted: (_) {
                                                         Utils.fieldFocusChange(
                                                             context,
                                                             _widthFocus,
                                                             _heightFocus);
                                                       },
-                                                      validator: Validation
-                                                          .validateTextField,
                                                       onSaved: (value) {
                                                         _width = value;
                                                       },
                                                     ),
                                                   ),
-                                                ],
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    bottom: 0.0),
-                                                child: new Container(
-                                                  height: 1.0,
-                                                  color: Colors.grey,
                                                 ),
                                               ),
                                             ],
@@ -1305,65 +1541,126 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                         child: Padding(
                                           padding:
                                               const EdgeInsets.only(left: 8.0),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                          child: Stack(
                                             children: <Widget>[
-                                              Row(
-                                                children: <Widget>[
-                                                  Image(
-                                                    image: new AssetImage(
-                                                        'assets/images/height.png'),
-                                                    width: 20.0,
-                                                    height: 20.0,
-                                                    //fit: BoxFit.fitHeight,
-                                                  ),
-                                                  Container(
-                                                    width: 8.0,
-                                                  ),
-                                                  Expanded(
-                                                    child: TextFormField(
+                                              /*Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        child: Text(
+                                          StringValues
+                                          .weight,
+                                          style: TextStyle(
+                                          color: Color(
+                                              ColorValues
+                                                  .text_view_theme),
+                                          fontSize: 14.0),
+                                        ),
+                                      ),*/
+                                              isHeightError
+                                                  ? Positioned(
+                                                right: 0.0,
+                                                bottom: 5.0,
+                                                //alignment: Alignment.bottomRight,
+                                                child: Image(
+                                                  image: new AssetImage(
+                                                      'assets/images/error_icon_red.png'),
+                                                  width: 16.0,
+                                                  height: 16.0,
+                                                  //fit: BoxFit.fitHeight,
+                                                ),
+                                              )
+                                                  : Container(),
+                                              Theme(
+                                                data: Theme.of(context)
+                                                    .copyWith(
+                                                  primaryColor: Color(
+                                                      ColorValues
+                                                          .text_view_theme),
+                                                ),
+                                                child: Padding(
+                                                  padding:
+                                                  const EdgeInsets
+                                                      .only(
+                                                      top: 16.0),
+                                                  child: SizedBox(
+                                                    height: 65.0,
+                                                    child:
+                                                    TextFormField(
                                                       controller:
-                                                          heightController,
+                                                      heightController,
                                                       focusNode: _heightFocus,
                                                       keyboardType:
-                                                          TextInputType.number,
+                                                      TextInputType.number,
                                                       //to block space character
                                                       textInputAction:
-                                                          TextInputAction.next,
+                                                      TextInputAction.next,
+
+                                                      //autofocus: true,
                                                       decoration:
-                                                          InputDecoration(
-                                                        labelText:
-                                                            StringValues.height,
-                                                        hintText:
-                                                            StringValues.height,
-                                                        border:
-                                                            InputBorder.none,
-                                                        //errorText: submitFlag ? _validateEmail() : null,
+                                                      InputDecoration(
+                                                        //contentPadding: EdgeInsets.all(0.0),
+                                                        helperText: ' ',
+                                                        prefixIcon:
+                                                        Padding(
+                                                          padding:
+                                                          const EdgeInsets
+                                                              .all(
+                                                              0.0),
+                                                          child:
+                                                          Transform
+                                                              .scale(
+                                                            scale: 0.65,
+                                                            child:
+                                                            IconButton(
+                                                              onPressed:
+                                                                  () {},
+                                                              icon: new Image
+                                                                  .asset(
+                                                                  "assets/images/height.png"),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        //icon: Icon(Icons.lock_outline),
+                                                        counterText: '',
+                                                        //labelText: StringValues.TEXT_EMAIL,
+                                                        hintText:StringValues.height,
+                                                        //border: InputBorder.none,
+                                                        focusedBorder: UnderlineInputBorder(
+                                                            borderSide:
+                                                            BorderSide(
+                                                                color:
+                                                                Colors.grey)),
+                                                        /*errorText:
+                                                                            submitFlag ? _validateEmail() : null,*/
                                                       ),
+
+                                                      validator:
+                                                          (String arg) {
+                                                        String val =
+                                                        Validation
+                                                            .validateTextField(
+                                                            arg);
+                                                        //setState(() {
+                                                        if (val != null)
+                                                          isHeightError =
+                                                          true;
+                                                        else
+                                                          isHeightError =
+                                                          false;
+                                                        //});
+                                                        return val;
+                                                      },
                                                       onFieldSubmitted: (_) {
                                                         Utils.fieldFocusChange(
                                                             context,
                                                             _heightFocus,
                                                             _weightFocus);
                                                       },
-                                                      validator: Validation
-                                                          .validateTextField,
                                                       onSaved: (value) {
                                                         _height = value;
                                                       },
                                                     ),
                                                   ),
-                                                ],
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    bottom: 0.0),
-                                                child: new Container(
-                                                  height: 1.0,
-                                                  color: Colors.grey,
                                                 ),
                                               ),
                                             ],
@@ -1372,166 +1669,315 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                       ),
                                     ],
                                   ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
+                                  //Container(height: 10.0,),
+                                  Stack(
                                     children: <Widget>[
-                                      Image(
-                                        image: new AssetImage(
-                                            'assets/images/weight.png'),
-                                        width: 20.0,
-                                        height: 20.0,
-                                        //fit: BoxFit.fitHeight,
-                                      ),
-                                      Container(
-                                        width: 8.0,
-                                      ),
-                                      Expanded(
-                                        child: TextFormField(
-                                          controller: weightController,
-                                          focusNode: _weightFocus,
-                                          keyboardType: TextInputType.number,
-                                          //to block space character
-                                          textInputAction: TextInputAction.next,
-                                          decoration: InputDecoration(
-                                            labelText: StringValues.weight,
-                                            hintText: StringValues.weight,
-                                            border: InputBorder.none,
-                                            //errorText: submitFlag ? _validateEmail() : null,
-                                          ),
-                                          onFieldSubmitted: (_) {
-                                            Utils.fieldFocusChange(context,
-                                                _weightFocus, _valueFocus);
-                                          },
-                                          validator:
-                                              Validation.validateTextField,
-                                          onSaved: (value) {
-                                            _weight = value;
-                                          },
+                                      /*Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        child: Text(
+                                          StringValues
+                                              .weight,
+                                          style: TextStyle(
+                                              color: Color(
+                                                  ColorValues
+                                                      .text_view_theme),
+                                              fontSize: 14.0),
                                         ),
-                                      ),
-                                      Container(
-                                        width: 60.0,
-                                        height: 25.0,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              new BorderRadius.circular(5.0),
-                                          //color: Color(ColorValues.grey_hint_color),
-                                          shape: BoxShape.rectangle,
-                                          border: Border.all(
-                                            color: Color(
-                                                ColorValues.grey_hint_color),
-                                            width: 1,
-                                            style: BorderStyle.solid,
+                                      ),*/
+                                      Positioned(
+                                        right: 0.0,
+                                        top: 20.0,
+                                        //bottom: 0.0,
+                                        //alignment: Alignment.centerRight,
+                                        child: Container(
+                                          width: 60.0,
+                                          height: 25.0,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                            new BorderRadius.circular(5.0),
+                                            //color: Color(ColorValues.grey_hint_color),
+                                            shape: BoxShape.rectangle,
+                                            border: Border.all(
+                                              color: Color(
+                                                  ColorValues.grey_hint_color),
+                                              width: 1,
+                                              style: BorderStyle.solid,
+                                            ),
                                           ),
-                                        ),
-                                        child: Center(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(4.0),
-                                            child: DropdownButton<String>(
-                                              value: weightUnit,
-                                              icon: Image(
-                                                image: new AssetImage(
-                                                    'assets/images/down_arrow.png'),
-                                                width: 7.0,
-                                                height: 7.0,
-                                                //fit: BoxFit.fitHeight,
-                                              ),
-                                              //Icon(Icons.arrow_drop_down),
-                                              //iconSize: 24,
-                                              elevation: 16,
+                                          child: Center(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(4.0),
+                                              child: DropdownButton<String>(
+                                                value: weightUnit,
 
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontStyle: FontStyle.normal),
-                                              /*underline: Container(
-                                                  height: 2,
-                                                  color: Colors.deepPurpleAccent,
+                                                /*icon: Image(
+                                                  image: new AssetImage(
+                                                      'assets/images/down_arrow.png'),
+                                                  width: 7.0,
+                                                  height: 7.0,
+                                                  //fit: BoxFit.fitHeight,
                                                 ),*/
-                                              onChanged: (String data) {
-                                                setState(() {
-                                                  weightUnit = data;
-                                                });
-                                              },
-                                              items: wUnitList.map<
-                                                  DropdownMenuItem<
-                                                      String>>((String value) {
-                                                return DropdownMenuItem<String>(
-                                                  value: value,
-                                                  child: Text(value),
-                                                );
-                                              }).toList(),
+                                                icon: Icon(
+                                                    Icons.keyboard_arrow_down),
+                                                iconSize: 16,
+                                                elevation: 16,
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontStyle: FontStyle.normal),
+                                                underline: Container(
+                                                  height: 2,
+                                                  color: Colors.transparent,
+                                                ),
+                                                onChanged: (String data) {
+                                                  setState(() {
+                                                    preWeightUnit = weightUnit;
+                                                    weightUnit = data;
+                                                    callWeightValueConverter();
+                                                  });
+                                                },
+                                                items: wUnitList.map<
+                                                    DropdownMenuItem<
+                                                        String>>((String value) {
+                                                  return DropdownMenuItem<String>(
+                                                    value: value,
+                                                    child: Text(value),
+                                                  );
+                                                }).toList(),
+                                              ),
                                             ),
                                           ),
                                         ),
+                                      ),
+                                      isWeightError
+                                          ? Positioned(
+                                        right: 0.0,
+                                        bottom: 5.0,
+                                        //alignment: Alignment.bottomRight,
+                                        child: Image(
+                                          image: new AssetImage(
+                                              'assets/images/error_icon_red.png'),
+                                          width: 16.0,
+                                          height: 16.0,
+                                          //fit: BoxFit.fitHeight,
+                                        ),
                                       )
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 0.0),
-                                    child: new Container(
-                                      height: 1.0,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Image(
-                                        image: new AssetImage(
-                                            'assets/images/value.png'),
-                                        width: 20.0,
-                                        height: 20.0,
-                                        //fit: BoxFit.fitHeight,
-                                      ),
-                                      Container(
-                                        width: 8.0,
-                                      ),
-                                      Expanded(
-                                        child: TextFormField(
-                                          textCapitalization:
-                                              TextCapitalization.words,
-                                          controller: valueController,
-                                          focusNode: _valueFocus,
-                                          keyboardType: TextInputType.number,
-                                          /*inputFormatters: [
-                                WhitelistingTextInputFormatter.digitsOnly,
-                                // Fit the validating format.
-                              ],*/
-                                          //to block space character
-                                          textInputAction: TextInputAction.next,
+                                          : Container(),
+                                      Theme(
+                                        data: Theme.of(context)
+                                            .copyWith(
+                                          primaryColor: Color(
+                                              ColorValues
+                                                  .text_view_theme),
+                                        ),
+                                        child: Padding(
+                                          padding:
+                                          const EdgeInsets
+                                              .only(
+                                              top: 16.0),
+                                          child: SizedBox(
+                                            height: 65.0,
+                                            child:
+                                            TextFormField(
+                                              controller: weightController,
+                                              focusNode: _weightFocus,
+                                              keyboardType: TextInputType.number,
+                                              //to block space character
+                                              textInputAction: TextInputAction.next,
 
-                                          //autofocus: true,
-                                          decoration: InputDecoration(
-                                            labelText: StringValues.value,
-                                            hintText: StringValues.value,
-                                            border: InputBorder.none,
-                                            /*errorText:
-                                                                    submitFlag ? _validateEmail() : null,*/
+                                              //autofocus: true,
+                                              decoration:
+                                              InputDecoration(
+                                                //contentPadding: EdgeInsets.all(0.0),
+                                                helperText: ' ',
+                                                prefixIcon:
+                                                Padding(
+                                                  padding:
+                                                  const EdgeInsets
+                                                      .all(
+                                                      0.0),
+                                                  child:
+                                                  Transform
+                                                      .scale(
+                                                    scale: 0.65,
+                                                    child:
+                                                    IconButton(
+                                                      onPressed:
+                                                          () {},
+                                                      icon: new Image
+                                                          .asset(
+                                                          "assets/images/weight.png"),
+                                                    ),
+                                                  ),
+                                                ),
+                                                //icon: Icon(Icons.lock_outline),
+                                                counterText: '',
+                                                //labelText: StringValues.TEXT_EMAIL,
+                                                hintText:StringValues.weight,
+                                                //border: InputBorder.none,
+                                                focusedBorder: UnderlineInputBorder(
+                                                    borderSide:
+                                                    BorderSide(
+                                                        color:
+                                                        Colors.grey)),
+                                                /*errorText:
+                                                                                submitFlag ? _validateEmail() : null,*/
+                                              ),
+
+                                              validator:
+                                                  (String arg) {
+                                                String val =
+                                                Validation
+                                                    .validateTextField(
+                                                    arg);
+                                                //setState(() {
+                                                if (val != null)
+                                                  isWeightError =
+                                                  true;
+                                                else
+                                                  isWeightError =
+                                                  false;
+                                                //});
+                                                return val;
+                                              },
+                                              onFieldSubmitted: (_) {
+                                                Utils.fieldFocusChange(context,
+                                                    _weightFocus, _valueFocus);
+                                              },
+                                              onSaved: (value) {
+                                                _weight = value;
+                                              },
+                                            ),
                                           ),
-                                          onFieldSubmitted: (_) {
-                                            Utils.fieldFocusChange(context,
-                                                _valueFocus, _descriptionFocus);
-                                          },
-                                          /*validator:
-                                              Validation.validateTextField,*/
-                                          onSaved: (value) {
-                                            _value = value;
-                                          },
                                         ),
                                       ),
                                     ],
                                   ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 16.0),
-                                    child: new Container(
-                                      height: 1.0,
-                                      color: Colors.grey,
-                                    ),
+                                  Stack(
+                                    children: <Widget>[
+                                      /*Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        child: Text(
+                                          StringValues
+                                              .value,
+                                          style: TextStyle(
+                                              color: Color(
+                                                  ColorValues
+                                                      .text_view_theme),
+                                              fontSize: 14.0),
+                                        ),
+                                      ),*/
+
+                                      /*isValueError
+                                          ? Positioned(
+                                        right: 0.0,
+                                        bottom: 5.0,
+                                        //alignment: Alignment.bottomRight,
+                                        child: Image(
+                                          image: new AssetImage(
+                                              'assets/images/error_icon_red.png'),
+                                          width: 16.0,
+                                          height: 16.0,
+                                          //fit: BoxFit.fitHeight,
+                                        ),
+                                      )
+                                          : Container(),*/
+                                      Theme(
+                                        data: Theme.of(context)
+                                            .copyWith(
+                                          primaryColor: Color(
+                                              ColorValues
+                                                  .text_view_theme),
+                                        ),
+                                        child: Padding(
+                                          padding:
+                                          const EdgeInsets
+                                              .only(
+                                              top: 0.0),
+                                          child: SizedBox(
+                                            height: 65.0,
+                                            child:
+                                            TextFormField(
+                                              textCapitalization:
+                                              TextCapitalization.words,
+                                              controller: valueController,
+                                              focusNode: _valueFocus,
+                                              keyboardType: TextInputType.number,
+
+                                              //to block space character
+                                              textInputAction: TextInputAction.next,
+                                              decoration:
+                                              InputDecoration(
+                                                //contentPadding: EdgeInsets.all(0.0),
+                                                helperText: ' ',
+                                                prefixIcon:
+                                                Padding(
+                                                  padding:
+                                                  const EdgeInsets
+                                                      .all(
+                                                      0.0),
+                                                  child:
+                                                  Transform
+                                                      .scale(
+                                                    scale: 0.65,
+                                                    child:
+                                                    IconButton(
+                                                      onPressed:
+                                                          () {},
+                                                      icon: new Image
+                                                          .asset(
+                                                          "assets/images/value.png"),
+                                                    ),
+                                                  ),
+                                                ),
+                                                //icon: Icon(Icons.lock_outline),
+                                                counterText: '',
+                                                //labelText: StringValues.TEXT_EMAIL,
+                                                hintText:StringValues.value,
+                                                //border: InputBorder.none,
+                                                focusedBorder: UnderlineInputBorder(
+                                                    borderSide:
+                                                    BorderSide(
+                                                        color:
+                                                        Colors.grey)),
+                                                /*errorText:
+                                                                                submitFlag ? _validateEmail() : null,*/
+                                              ),
+
+                                              /*validator:
+                                                  (String arg) {
+                                                String val =
+                                                Validation
+                                                    .validateTextField(
+                                                    arg);
+                                                //setState(() {
+                                                if (val != null)
+                                                  isValueError =
+                                                  true;
+                                                else
+                                                  isValueError =
+                                                  false;
+                                                //});
+                                                return val;
+                                              },*/
+                                              onFieldSubmitted: (_) {
+                                                Utils.fieldFocusChange(context,
+                                                    _valueFocus, _descriptionFocus);
+                                              },
+                                              onSaved: (value) {
+                                                _value = value;
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
+
+
 
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -1577,6 +2023,7 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                           child: Text(
                                             StringValues.insurance,
                                             style: TextStyle(
+                                                decoration: TextDecoration.underline,
                                                 color: Color(
                                                     ColorValues.blueTheme),
                                                 fontSize: 14.0),
@@ -1634,20 +2081,42 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                       ),
                                     ),
                                   ),
-                                  Visibility(
-                                    child: Text(
-                                      "Select Ready Date",
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                    visible: hasReadyDateError,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 0.0),
-                                    child: new Container(
-                                      height: 1.0,
-                                      color: Colors.grey,
-                                      //width: MediaQuery.of(context).size.width - 75,
-                                    ),
+                                  Stack(
+                                    children: <Widget>[
+                                      Padding(
+                                        padding:
+                                        const EdgeInsets.only(bottom: 10.0),
+                                        child: new Container(
+                                          height: 1.0,
+                                          color: hasReadyDateError?Color(ColorValues.error_red) :Colors.grey,
+                                        ),
+                                      ),
+                                      Visibility(
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(top:5.0),
+                                            child: Text(
+                                              StringValues.readyDateError,
+                                              style: TextStyle(color: Color(ColorValues.error_red),fontSize: 12.0),
+                                            ),
+                                          ),
+                                        ),
+                                        visible: hasReadyDateError,
+                                      ),
+                                      hasReadyDateError ? Positioned(
+                                        right: 0.0,
+                                        bottom: 0.0,
+                                        //alignment: Alignment.bottomRight,
+                                        child: Image(
+                                          image: new AssetImage(
+                                              'assets/images/error_icon_red.png'),
+                                          width: 16.0,
+                                          height: 16.0,
+                                          //fit: BoxFit.fitHeight,
+                                        ),
+                                      ):Container(),
+                                    ],
                                   ),
                                   GestureDetector(
                                     onTap: () async {
@@ -1690,60 +2159,137 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                       ),
                                     ),
                                   ),
-                                  Visibility(
-                                    child: Text(
-                                      "Select Delivery Date",
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                    visible: hasDeliveryDateError,
+                                  Stack(
+                                    children: <Widget>[
+                                      Padding(
+                                        padding:
+                                        const EdgeInsets.only(bottom: 10.0),
+                                        child: new Container(
+                                          height: 1.0,
+                                          color: hasDeliveryDateError?Color(ColorValues.error_red) :Colors.grey,
+                                        ),
+                                      ),
+                                      Visibility(
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(top:5.0),
+                                            child: Text(
+                                              StringValues.deliverDateError,
+                                              style: TextStyle(color: Color(ColorValues.error_red),fontSize: 12.0),
+                                            ),
+                                          ),
+                                        ),
+                                        visible: hasDeliveryDateError,
+                                      ),
+                                      hasDeliveryDateError ? Positioned(
+                                        right: 0.0,
+                                        bottom: 0.0,
+                                        //alignment: Alignment.bottomRight,
+                                        child: Image(
+                                          image: new AssetImage(
+                                              'assets/images/error_icon_red.png'),
+                                          width: 16.0,
+                                          height: 16.0,
+                                          //fit: BoxFit.fitHeight,
+                                        ),
+                                      ):Container(),
+                                    ],
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 0.0),
-                                    child: new Container(
-                                      height: 1.0,
-                                      color: Colors.grey,
-                                      //width: MediaQuery.of(context).size.width - 75,
-                                    ),
-                                  ),
-                                  TextFormField(
-                                    textCapitalization:
-                                        TextCapitalization.words,
-                                    controller: descriptionController,
-                                    focusNode: _descriptionFocus,
-                                    keyboardType: TextInputType.multiline,
-                                    maxLines: 4,
-                                    /*inputFormatters: [
+                                  Container(height: 16.0,),
+                                  Stack(
+                                    children: <Widget>[
+                                      Positioned(
+                                        top: 0,
+                                        left: 0,
+                                        child: Text(
+                                          StringValues
+                                              .description,
+                                          style: TextStyle(
+                                              color: Color(
+                                                  ColorValues
+                                                      .text_view_theme),
+                                              fontSize: 17.0),
+                                        ),
+                                      ),
+                                      isDescError
+                                          ? Positioned(
+                                        right: 0.0,
+                                        bottom: 5.0,
+                                        //alignment: Alignment.bottomRight,
+                                        child: Image(
+                                          image: new AssetImage(
+                                              'assets/images/error_icon_red.png'),
+                                          width: 16.0,
+                                          height: 16.0,
+                                          //fit: BoxFit.fitHeight,
+                                        ),
+                                      )
+                                          : Container(),
+                                      Theme(
+                                        data: Theme.of(context)
+                                            .copyWith(
+                                          primaryColor: Color(
+                                              ColorValues
+                                                  .text_view_theme),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(top:16.0),
+                                          child: TextFormField(
+                                            textCapitalization:
+                                                TextCapitalization.sentences,
+                                            controller: descriptionController,
+                                            focusNode: _descriptionFocus,
+                                            keyboardType: TextInputType.multiline,
+                                            maxLines: 4,
+                                            maxLength: 400,
+                                            /*inputFormatters: [
                                 WhitelistingTextInputFormatter.digitsOnly,
                                 // Fit the validating format.
                               ],*/
-                                    //to block space character
-                                    textInputAction: TextInputAction.next,
+                                            //to block space character
+                                            textInputAction: TextInputAction.next,
 
-                                    //autofocus: true,
-                                    decoration: InputDecoration(
-                                      labelText: StringValues.description,
-                                      hintText: StringValues.description,
-                                      border: InputBorder.none,
-                                      /*errorText:
-                                                              submitFlag ? _validateEmail() : null,*/
-                                    ),
-                                    /*onFieldSubmitted: (_) {
-                                      Utils.fieldFocusChange(
-                                          context, _valueFocus, _emailFocus);
-                                    },*/
-                                    validator: Validation.validateTextField,
-                                    onSaved: (value) {
-                                      _description = value;
-                                    },
+                                            //autofocus: true,
+                                            decoration: InputDecoration(
+
+                                              //labelText: StringValues.description,
+                                              //hintText: StringValues.description,
+                                              //border: InputBorder.none,
+                                              counterText: '',
+                                              /*errorText:
+                                                                      submitFlag ? _validateEmail() : null,*/
+                                            ),
+                                            /*onFieldSubmitted: (_) {
+                                              Utils.fieldFocusChange(
+                                                  context, _valueFocus, _emailFocus);
+                                            },*/
+                                            //validator: Validation.validateTextField,
+                                            validator:
+                                                (String arg) {
+                                              String val =
+                                              Validation
+                                                  .validateTextField(
+                                                  arg);
+                                              //setState(() {
+                                              if (val != null)
+                                                isDescError =
+                                                true;
+                                              else
+                                                isDescError =
+                                                false;
+                                              //});
+                                              return val;
+                                            },
+                                              onSaved: (value) {
+                                              _description = value;
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 15.0),
-                                    child: new Container(
-                                      height: 1.0,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
+                                 Container(height: 15.0,),
                                   Row(
                                     children: <Widget>[
                                       GestureDetector(
@@ -1752,9 +2298,48 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                           setState(() {
                                             _imagePath=_imagePath;
                                           });*/
-                                          if (imageList.length < 5)
-                                            getAlertDialog(context);
-                                          else
+                                          if (imageList.length < 5) {
+                                            //
+                                            //
+                                            //
+                                            // (context);
+
+                                            final ImageSelectionAction action =
+                                                await new CustomAlertDialog()
+                                                    .getImageSelectorAlertDialog(
+                                                        context);
+                                            print("Image Action::: $action");
+                                            if (action ==
+                                                ImageSelectionAction.GALLERY) {
+
+                                              _imagePath =
+                                                  await ImagePickerUtility
+                                                      .getImageFromGallery();
+                                              if (imageList == null)
+                                                imageList = new List();
+                                              if (_imagePath != null) {
+                                                setState(() {
+                                                  imageList.add(_imagePath);
+                                                });
+                                              }
+                                              print(
+                                                  'imageList size:: ${imageList.length}');
+                                            } else if (action ==
+                                                ImageSelectionAction.CAMERA) {
+                                              _imagePath =
+                                                  await ImagePickerUtility
+                                                      .getImageFromCamera();
+                                              if (imageList == null)
+                                                imageList = new List();
+                                              if (_imagePath != null) {
+                                                setState(() {
+                                                  imageList.add(_imagePath);
+                                                });
+                                              }
+                                              print(
+                                                  'imageList size:: ${imageList.length}');
+                                            }
+                                          } else
                                             Toast.show(
                                                 "${StringValues.maxImageLimit}",
                                                 context,
@@ -1763,7 +2348,7 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                         },
                                         child: Image(
                                           image: new AssetImage(
-                                              'assets/images/add_img.png'),
+                                              'assets/images/add_package.png'),
                                           width: 95.0,
                                           height: 95.0,
                                           //fit: BoxFit.cover,
@@ -1803,37 +2388,7 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                     ],
                                   ),
                                   Container(
-                                    height: 15.0,
-                                  ),
-                                  /*  imageList != null
-                                      ? ListView.builder(
-                                          padding: const EdgeInsets.all(8),
-                                          scrollDirection: Axis.horizontal,
-                                          itemCount: imageList.length,
-                                          itemBuilder:
-                                              (BuildContext context,
-                                                  int index) {
-                                            return Container(
-                                              height: 50,
-                                              margin: EdgeInsets.all(2),
-                                              color: index % 2 == 0
-                                                  ? Colors.blue[400]
-                                                  : Colors.grey,
-                                              child: Center(
-                                                  child: Text(
-                                                '$index:: ${imageList[index]}',
-                                                style:
-                                                    TextStyle(fontSize: 12),
-                                              )),
-                                            );
-                                          })
-                                      : Container(),
-                                  Container(
-                                    height: 15.0,
-                                  ),*/
-
-                                  Container(
-                                    height: 15.0,
+                                    height: 8.0,
                                   ),
 
                                   Row(
@@ -1876,12 +2431,24 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                         child: Padding(
                                           padding:
                                               const EdgeInsets.only(left: 8.0),
-                                          child: Text(
-                                            StringValues.agree_t_n_c,
-                                            style: TextStyle(
-                                                color: Color(
-                                                    ColorValues.text_view_hint),
-                                                fontSize: 14.0),
+                                          child: Row(
+                                            children: <Widget>[
+                                              Text(
+                                                StringValues.i_agree_to,
+                                                style: TextStyle(
+                                                    color: Color(
+                                                        ColorValues.text_view_hint),
+                                                    fontSize: 14.0),
+                                              ),
+                                              Text(
+                                                StringValues.t_n_c,
+                                                style: TextStyle(
+                                                    decoration: TextDecoration.underline,
+                                                    color: Color(
+                                                        ColorValues.text_view_hint),
+                                                    fontSize: 14.0),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       )
@@ -1889,7 +2456,7 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
                                   ),
                                   Padding(
                                       padding: const EdgeInsets.only(
-                                          bottom: 30.0, top: 15.0)),
+                                          bottom: 30.0, top: 8.0)),
                                   Row(
                                     mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment:
@@ -2105,76 +2672,6 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
     }
   }
 
-  Widget getAlertDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      //barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: new SingleChildScrollView(
-            child: new ListBody(
-              children: <Widget>[
-                //Container(child: _imagePath!= null? _imagePath:null),
-                Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text("Take a picture"),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                ),
-                GestureDetector(
-                    child: Row(
-                      children: <Widget>[
-                        Icon(Icons.camera),
-                        SizedBox(width: 5),
-                        Text('Gallery'),
-                      ],
-                    ),
-                    onTap: () async {
-                      Navigator.of(context).pop();
-                      _imagePath =
-                          await ImagePickerUtility.getImageFromGallery();
-                      if (imageList == null) imageList = new List();
-
-                      if (_imagePath != null) {
-                        setState(() {
-                          imageList.add(_imagePath);
-                        });
-                      }
-
-                      print('imageList size:: ${imageList.length}');
-                    }),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                ),
-                GestureDetector(
-                    child: Row(
-                      children: <Widget>[
-                        Icon(Icons.camera_alt),
-                        SizedBox(width: 5),
-                        Text('Camera'),
-                      ],
-                    ),
-                    onTap: () async {
-                      Navigator.of(context).pop();
-                      _imagePath =
-                          await ImagePickerUtility.getImageFromCamera();
-                      if (imageList == null) imageList = new List();
-                      if (_imagePath != null) {
-                        setState(() {
-                          imageList.add(_imagePath);
-                        });
-                      }
-                      print('imageList size:: ${imageList.length}');
-                    }),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   callDeliveryRequestApi() async {
     print("callDeliveryRequestApi::::: ");
     //if (!mounted) return;
@@ -2374,11 +2871,12 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
         cmBgColor = Color(ColorValues.primaryColor);
         cmTextColor = Color(ColorValues.white);
 
-        _length = Utils.convertInchToCM(double.parse(lengthController.text)).toString();
-        lengthController.text=_length.toString();
-        _width = Utils.convertInchToCM(double.parse(widthController.text)).toString();
-        widthController.text=_width.toString();
-        _height = Utils.convertInchToCM(double.parse(heightController.text)).toString();
+        _length = Utils.convertInchToCM(lengthController.text);
+        lengthController.text = _length.toString();
+        _width = Utils.convertInchToCM(widthController.text);
+        widthController.text = _width.toString();
+        _height = Utils.convertInchToCM(heightController.text);
+        heightController.text = _height.toString();
       } else {
         dimenUnit = StringValues.inch;
         inchBgColor = Color(ColorValues.primaryColor);
@@ -2386,12 +2884,12 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
         cmBgColor = Color(ColorValues.white);
         cmTextColor = Color(ColorValues.primaryColor);
 
-        _length = Utils.convertCMTOInch(double.parse(lengthController.text)).toString();
-        lengthController.text=_length.toString();
-        _width = Utils.convertCMTOInch(double.parse(widthController.text)).toString();
-        widthController.text=_width.toString();
-        _height = Utils.convertCMTOInch(double.parse(heightController.text)).toString();
-        heightController.text=_height.toString();
+        _length = Utils.convertCMTOInch(lengthController.text);
+        lengthController.text = _length.toString();
+        _width = Utils.convertCMTOInch(widthController.text);
+        widthController.text = _width.toString();
+        _height = Utils.convertCMTOInch(heightController.text);
+        heightController.text = _height.toString();
       }
       print("dimenUnit:: $dimenUnit");
     });
@@ -2695,5 +3193,45 @@ class _DeliveryRequestState extends State<DeliveryRequest> {
         SharedPreferencesHelper.ACCESS_TOKEN);
     userId = await SharedPreferencesHelper.getPrefInt(
         SharedPreferencesHelper.USER_ID);
+  }
+
+  void callWeightValueConverter() {
+    print("preWeightUnit::: $preWeightUnit \n weightUnit::: $weightUnit");
+    double weightVal= double.parse(weightController.text);
+    double convertedValue;
+    if (preWeightUnit == StringValues.LBS) {
+      if (weightUnit == StringValues.GRAM) {
+        //call LBS to GRAM
+        convertedValue=weightVal*454;//weightVal*0.454*1000
+      } else {
+        //call LBS to KG
+        //1 lb = 0.454 kg
+        //convertedValue=weightVal*0.454;
+        convertedValue=weightVal/2.205;
+      }
+    } else if (preWeightUnit == StringValues.KG) {
+      if (weightUnit == StringValues.GRAM) {
+        //call KG to GRAM
+        convertedValue=weightVal*1000;
+      } else {
+        //call KG to LBS
+        //convertedValue=weightVal/0.454;//both is correct
+        convertedValue=weightVal*2.205;
+      }
+    } else if (preWeightUnit == StringValues.GRAM) {
+      if (weightUnit == StringValues.KG) {
+        //call GRAM to KG
+        convertedValue=weightVal/1000;
+      } else {
+        //call GRAM to LBS
+        convertedValue=weightVal/454;
+      }
+    }
+    //convertedValue.roundToDouble();
+    convertedValue=double.parse((convertedValue).toStringAsFixed(2));
+    setState(() {
+      _weight = convertedValue.toString();
+      weightController.text=_weight;
+    });
   }
 }

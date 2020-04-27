@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:deliva/constants/Constant.dart';
+import 'package:deliva/podo/login_response.dart';
 import 'package:deliva/registration/my_profile.dart';
 import 'package:deliva/podo/api_response.dart';
 import 'package:deliva/registration/registration.dart';
@@ -39,13 +41,37 @@ class _RegistrationOTPState extends State<RegistrationOTP> {
 
   bool _isInProgress = false;
 
-  //String _mobileNo = widge.mobileNo;
+  Timer _timer;
+  int _start = Constants.OTP_TIMER;
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    startTimer();
+  }
   @override
   void dispose() {
     // TODO: implement dispose
     controller.dispose();
+    _timer.cancel();
     super.dispose();
+  }
+
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+      oneSec,
+          (Timer timer) => setState(
+            () {
+          if (_start < 1) {
+            timer.cancel();
+          } else {
+            _start = _start - 1;
+          }
+        },
+      ),
+    );
   }
 
   @override
@@ -145,11 +171,17 @@ class _RegistrationOTPState extends State<RegistrationOTP> {
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                                     child: Text(
-                                      StringValues.otp_screen_msg,
+                                      StringValues.otp_screen_msg_mobile,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           color: Color(ColorValues.text_view_hint),
                                           fontSize: 16.0),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top:40.0,bottom: 30.0),
+                                    child: Text('$_start ${StringValues.sec}',
+                                      style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 20.0,fontWeight: FontWeight.w600),
                                     ),
                                   ),
                                   PinCodeTextField(
@@ -158,13 +190,13 @@ class _RegistrationOTPState extends State<RegistrationOTP> {
                                     controller: controller,
                                     hideCharacter: false,
                                     highlight: true,
-                                    highlightColor: Color(ColorValues.yellow_light),
+                                    highlightColor: Color(ColorValues.grey_light_divider),
                                     //Colors.blue,
                                     defaultBorderColor:
-                                    Color(ColorValues.grey_hint_color),
+                                    Color(ColorValues.grey_light_divider),
                                     //Colors.black,
                                     hasTextBorderColor:
-                                    Color(ColorValues.grey_hint_color),
+                                    Color(ColorValues.grey_light_divider),
                                     //Colors.green,
                                     errorBorderColor: Color(ColorValues.text_red),
                                     maxLength: pinLength,
@@ -191,13 +223,30 @@ class _RegistrationOTPState extends State<RegistrationOTP> {
                                   ),
                                   Visibility(
                                     child: Text(
-                                      "Wrong OTP!",
+                                      StringValues.wrongOTP,
                                       style: TextStyle(color: Colors.red),
                                     ),
                                     visible: hasError,
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(bottom: 30.0),
+                                    padding: const EdgeInsets.only(bottom: 10.0),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      if(_start == 0){
+                                        callGetOtpApi();
+                                      }
+                                    },
+                                    child: Text(
+                                      StringValues.TEXT_RESEND_CODE,
+                                      style: TextStyle(
+                                        decoration: TextDecoration.underline,
+                                        color: _start != 0 ? Color(ColorValues.text_view_hint) : Color(ColorValues.blueTheme),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 40.0),
                                   ),
                                   SizedBox(
                                     width: 250.0,
@@ -220,21 +269,7 @@ class _RegistrationOTPState extends State<RegistrationOTP> {
                                       ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 40.0),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      callGetOtpApi();
-                                    },
-                                    child: Text(
-                                      StringValues.TEXT_RESEND_CODE,
-                                      style: TextStyle(
-                                        decoration: TextDecoration.underline,
-                                        color: Color(ColorValues.sea_blue),
-                                      ),
-                                    ),
-                                  )
+
                                 ],
                               ),
                             ),
@@ -320,10 +355,20 @@ class _RegistrationOTPState extends State<RegistrationOTP> {
         APIResponse apiResponse = new APIResponse.fromJson(jsonResponseMap);
         print("apiResponse.responseMessage:: ${apiResponse.responseMessage}");
         if (apiResponse.status == 200) {
+          _start=Constants.OTP_TIMER;
+          startTimer();
           if (apiResponse.resourceData == null) {
             //.isRegistrationComplete == "false"){
           } else if (apiResponse.resourceData.isRegistrationComplete ==
               "false") {
+            //==============================
+            SharedPreferencesHelper.setPrefString(
+                SharedPreferencesHelper.mobileNo, widget.mobileNo);
+            SharedPreferencesHelper.setPrefString(
+                SharedPreferencesHelper.countryCode, widget.countryCode);
+            SharedPreferencesHelper.setPrefInt(
+                SharedPreferencesHelper.USER_ID, apiResponse.resourceData.userId);
+            //===============================
             _navigateToMyProfile(apiResponse.resourceData.userId);
           }
         } /*else if (apiResponse.status == 409) {
@@ -361,18 +406,33 @@ class _RegistrationOTPState extends State<RegistrationOTP> {
     }
   }
 
-  void _navigateToRegistration() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => Registration()),
-    );
-  }
-
-  void _navigateToMyProfile(int userId) {
+  Future _navigateToMyProfile(int userId) async {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => MyProfile(widget.countryCode,widget.mobileNo,userId)),
+      MaterialPageRoute(builder: (context) => MyProfile(widget.countryCode,widget.mobileNo,userId,"register")),
     );
+    //final result = await Navigator.of(context).pushReplacementNamed('/profile',arguments: {widget.countryCode,widget.mobileNo,userId});
+   /* final result = await Navigator.of(context).pushReplacementNamed('/profile',arguments:<String, dynamic>{
+      'countryCode': widget.countryCode,
+      'mobileNo': widget.mobileNo,
+      'userId': userId
+    } );*/
+
+    /*final result1 = await Navigator.of(context).pushReplacementNamed('/profile',arguments: MyProfile(
+      widget.countryCode,
+      widget.mobileNo,
+      userId
+     ));*/
+
+    /*final resultData = await Navigator.of(context).pushReplacement(new MaterialPageRoute(settings: const RouteSettings(name: '/profile'), builder: (context) => new MyProfile('${widget.countryCode}','${widget.mobileNo}',userId)));
+    print('resultData:: $resultData');
+    if(resultData as int == Constants.popScreen)
+      Navigator.of(context).pop(Constants.popScreen);*/
+    /*final result =
+    await Navigator.of(context).pushReplacementNamed('/dashboard');
+    setState(() {
+      print('result:::: $result');
+    });*/
   }
 
   void callVerifyUserApi() async {
@@ -416,16 +476,52 @@ class _RegistrationOTPState extends State<RegistrationOTP> {
         //final jsonResponse = json.decode(response.body);
         print('jsonResponse::::: ${jsonResponseMap.toString()}');
         //ResponsePodo responsePodo = new ResponsePodo.fromJson(jsonResponseMap);
-        APIResponse apiResponse = new APIResponse.fromJson(jsonResponseMap);
-        if(apiResponse.status == 200){
-          print("apiResponse.responseMessage:: ${apiResponse.responseMessage}");
-          print("userId:: ${apiResponse.resourceData.userId}");
+        LoginResponse loginResponse = new LoginResponse.fromJson(jsonResponseMap);
+        if (jsonResponseMap.containsKey("userid")) {
+          SharedPreferencesHelper.setPrefString(
+              SharedPreferencesHelper.ACCESS_TOKEN, loginResponse.accessToken);
+          SharedPreferencesHelper.setPrefString(
+              SharedPreferencesHelper.AWS_ACCESS_KEY, loginResponse.awsAccessKeyId);
+          SharedPreferencesHelper.setPrefString(
+              SharedPreferencesHelper.AWS_SECRET_KEY, loginResponse.awsSecretAccessKey);
+         /* SharedPreferencesHelper.setPrefBool(
+              SharedPreferencesHelper.IS_LOGGED_IN, true);*/
+          SharedPreferencesHelper.setPrefString(
+              SharedPreferencesHelper.TOKEN_TYPE, loginResponse.tokenType);
+          SharedPreferencesHelper.setPrefString(
+              SharedPreferencesHelper.REFRESH_TOKEN,
+              loginResponse.refreshToken);
+          SharedPreferencesHelper.setPrefInt(
+              SharedPreferencesHelper.EXPIRES_IN, loginResponse.expiresIn);
+          SharedPreferencesHelper.setPrefString(
+              SharedPreferencesHelper.SCOPE, loginResponse.scope);
 
-          _navigateToMyProfile(apiResponse.resourceData.userId);
+          SharedPreferencesHelper.setPrefInt(
+              SharedPreferencesHelper.USER_ID, loginResponse.userid);
+          SharedPreferencesHelper.setPrefBool(
+              SharedPreferencesHelper.IS_REGISTRATION_COMPLETE,
+              loginResponse.isRegistrationComplete);
+          SharedPreferencesHelper.setPrefBool(
+              SharedPreferencesHelper.IS_ACTIVE, loginResponse.isActive);
+          SharedPreferencesHelper.setPrefBool(
+              SharedPreferencesHelper.IS_PROFILE_COMPLETE,
+              loginResponse.isProfileComplete);
+          SharedPreferencesHelper.setPrefString(
+              SharedPreferencesHelper.JIT, loginResponse.jti);
 
-          Toast.show("${apiResponse.message}", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
-        }else{
-          Toast.show("${apiResponse.message}", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
+          //==============================
+          SharedPreferencesHelper.setPrefString(
+              SharedPreferencesHelper.mobileNo, widget.mobileNo);
+          SharedPreferencesHelper.setPrefString(
+              SharedPreferencesHelper.countryCode, widget.countryCode);
+          //===============================
+
+          Toast.show("User logged in successfully.", context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+          _navigateToMyProfile(loginResponse.userid);
+        } else if (jsonResponseMap.containsKey("error")) {
+          Toast.show("${loginResponse.errorDescription}", context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         }
         _isSubmitPressed = false;
         setState(() {

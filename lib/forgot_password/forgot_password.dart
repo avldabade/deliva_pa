@@ -46,6 +46,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   bool hasError = false;
 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _autoValidate = false;
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -150,128 +153,144 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                               children: <Widget>[
                                 Container(
                                   margin: const EdgeInsets.all(24.0),
-                                  child: Column(
-                                    children: <Widget>[
-                                      Image(
-                                        image: new AssetImage(
-                                            'assets/images/forgot_img.png'),
-                                        width: 127.0,
-                                        height: 174.0,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 0.0, bottom: 32.0),
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
+                                  child:Form(
+                                    key: _formKey,
+                                    autovalidate: _autoValidate,
+                                    child: SingleChildScrollView(
+                                      child: Column(
                                         children: <Widget>[
-
                                           Image(
                                             image: new AssetImage(
-                                                'assets/images/email_icon.png'),
-                                            width: 16.0,
-                                            height: 16.0,
-                                            //fit: BoxFit.fitHeight,
+                                                'assets/images/forgot_img.png'),
+                                            width: 127.0,
+                                            height: 174.0,
+                                            fit: BoxFit.cover,
                                           ),
-                                          Container(width: 8.0,),
-                                          Expanded(
-                                            child: TextFormField(
-                                              controller:
-                                              emailController,
-                                              focusNode:
-                                              _emailFocus,
-                                              keyboardType:
-                                              TextInputType
-                                                  .emailAddress,
-                                              //maxLength: 13,
-                                              /*inputFormatters: [
-                                                            WhitelistingTextInputFormatter
-                                                                .digitsOnly,
-                                                            // Fit the validating format.
-                                                            //_phoneNumberFormatter,
-                                                          ],*/
-                                              //to block space character
-                                              textInputAction:
-                                              TextInputAction
-                                                  .done,
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 0.0, bottom: 32.0),
+                                          ),
+                                          Stack(
+                                            children: <Widget>[
+                                              Positioned(
+                                                top:0,
+                                                left: 0,
+                                                child: Text(StringValues.TEXT_EMAIL,style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 17.0),),),
+                                              hasError ? Positioned(
+                                                right: 0.0,
+                                                bottom: 5.0,
+                                                //alignment: Alignment.bottomRight,
+                                                child: Image(
+                                                  image: new AssetImage(
+                                                      'assets/images/error_icon_red.png'),
+                                                  width: 16.0,
+                                                  height: 16.0,
+                                                  //fit: BoxFit.fitHeight,
+                                                ),
+                                              ):Container(),
+                                              Theme(
+                                                data: Theme.of(context)
+                                                    .copyWith(primaryColor: Color(ColorValues.text_view_theme),),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(top: 16.0),
+                                                  child: TextFormField(
+                                                    controller:
+                                                    emailController,
+                                                    focusNode:
+                                                    _emailFocus,
+                                                    keyboardType:
+                                                    TextInputType
+                                                        .emailAddress,
+                                                    textInputAction:
+                                                    TextInputAction
+                                                        .done,
 
-                                              //autofocus: true,
-                                              decoration:
-                                              InputDecoration(
-                                                counterText: '',
-                                                labelText: StringValues
-                                                    .TEXT_EMAIL,
-                                                hintText: StringValues
-                                                    .TEXT_EMAIL,
-                                                border: InputBorder
-                                                    .none,
-                                                /*errorText:
-                                                                            submitFlag ? _validateEmail() : null,*/
+                                                    //autofocus: true,
+                                                    decoration:
+                                                    InputDecoration(
+                                                      //contentPadding: EdgeInsets.all(0.0),
+
+                                                      prefixIcon:
+                                                      Padding(
+                                                        padding: const EdgeInsets.all(0.0),
+                                                        child: Transform.scale(
+                                                          scale: 0.65,
+                                                          child: IconButton(
+                                                            onPressed: (){},
+                                                            icon: new Image.asset("assets/images/email_icon.png"),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      //icon: Icon(Icons.lock_outline),
+                                                      counterText: '',
+                                                      //labelText: StringValues.TEXT_EMAIL,
+                                                      hintText: StringValues
+                                                          .TEXT_EMAIL,
+                                                      //border: InputBorder.none,
+                                                      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+                                                      /*errorText:
+                                                                                  submitFlag ? _validateEmail() : null,*/
+                                                    ),
+                                                    onFieldSubmitted:
+                                                        (_) {
+                                                          _emailFocus
+                                                              .unfocus();
+                                                      validate();
+                                                    },
+                                                    validator: (String arg) {
+                                                      String val=Validation.isEmail(arg);
+                                                      //setState(() {
+                                                      if(val != null)
+                                                        hasError=true;
+                                                      else
+                                                        hasError=false;
+                                                      //});
+                                                      return val;
+                                                    },
+                                                    onSaved: (value) {
+                                                      //print('email value:: $value');
+                                                      _email = value;
+                                                    },
+
+                                                  ),
+                                                ),
                                               ),
-                                              onFieldSubmitted:
-                                                  (_) {
-                                                    validate();
+                                            ],
+                                          ),
+
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(bottom: 60.0),
+                                          ),
+                                          SizedBox(
+                                            width: 250.0,
+                                            height: 52.0,
+                                            child: RaisedButton(
+                                              shape: new RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      new BorderRadius.circular(
+                                                          30.0),
+                                                  side: BorderSide(
+                                                      color: Color(ColorValues
+                                                          .yellow_light))),
+                                              onPressed: () {
+                                                validate();
                                               },
-                                              validator: Validation
-                                                  .isEmail,
-                                              onSaved: (value) {
-                                                _email = value;
-                                              },
+                                              color:
+                                                  Color(ColorValues.yellow_light),
+                                              textColor: Colors.white,
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(10.0),
+                                                child: Text(
+                                                    StringValues.TEXT_SUBMIT
+                                                        .toUpperCase(),
+                                                    style: TextStyle(fontSize: 20)),
+                                              ),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 10.0),
-                                        child: new Container(
-                                          height: 1.0,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                      Visibility(
-                                        child: Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            StringValues.ENTER_VALID_EMAIL,
-                                            style: TextStyle(color: Colors.red),
-                                          ),
-                                        ),
-                                        visible: hasError,
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 60.0),
-                                      ),
-                                      SizedBox(
-                                        width: 250.0,
-                                        height: 52.0,
-                                        child: RaisedButton(
-                                          shape: new RoundedRectangleBorder(
-                                              borderRadius:
-                                                  new BorderRadius.circular(
-                                                      30.0),
-                                              side: BorderSide(
-                                                  color: Color(ColorValues
-                                                      .yellow_light))),
-                                          onPressed: () {
-                                            validate();
-                                          },
-                                          color:
-                                              Color(ColorValues.yellow_light),
-                                          textColor: Colors.white,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Text(
-                                                StringValues.TEXT_SUBMIT
-                                                    .toUpperCase(),
-                                                style: TextStyle(fontSize: 20)),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                 ),
                                 /*Spacer(),
@@ -427,7 +446,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         } else {
           _isSubmitPressed = false;
           //Utils.showGreenSnackBar(StringValues.INTERNET_ERROR, scaffoldKey);
-          print(StringValues.INTERNET_ERROR);
           Toast.show(StringValues.INTERNET_ERROR, context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         }
@@ -437,7 +455,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     }
   }
 
-  void _validateInputs() {
+ /* void _validateInputs() {
     if (Validation.isEmail(
         emailController.text) ==
         null) {
@@ -448,6 +466,19 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     } else {
       setState(() {
         this.hasError = true;
+      });
+      _isSubmitPressed = false;
+    }
+  }*/
+  void _validateInputs() {
+    if (_formKey.currentState.validate()) {
+//    If all data are correct then save data to out variables
+      _formKey.currentState.save();
+      callGetGenerateOtpApi();
+    } else {
+//    If all data are not valid then start auto validation.
+      setState(() {
+        _autoValidate = true;
       });
       _isSubmitPressed = false;
     }

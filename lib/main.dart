@@ -5,6 +5,7 @@ import 'package:deliva/login/login_options.dart';
 import 'package:deliva/login/login_with_email.dart';
 import 'package:deliva/login/login_with_mobile.dart';
 import 'package:deliva/login/splash_page.dart';
+import 'package:deliva/registration/my_profile.dart';
 import 'package:deliva/services/shared_preference_helper.dart';
 import 'package:deliva/services/utils.dart';
 import 'package:deliva/values/ColorValues.dart';
@@ -30,10 +31,17 @@ void main() async {
   //setState(() {
   try {
     bool _isLoggedin = (prefs.getBool('isLoggedin') ?? false);
+    bool _isProfileComplete = await SharedPreferencesHelper.getPrefBool(SharedPreferencesHelper.IS_PROFILE_COMPLETE);
+
     if (_isLoggedin) {
-      _defaultHome = new Dashboard();
+      /*if(_isProfileComplete){
+
+      }*/
+      _defaultHome = new Dashboard('','');
       SharedPreferencesHelper.setPrefBool(SharedPreferencesHelper.IS_LOGGED_OUT,false);
-    }
+    }/*else if(!_isProfileComplete){
+      _defaultHome = new MyProfile(countryCode, mobileNo, userId);
+    }*/
   } catch (exception) {
     print(exception);
   }
@@ -62,8 +70,9 @@ void main() async {
       '/loginMobile': (context) => LoginMobile(),
       '/loginOptions': (context) => LoginOptions(),
       //'/registration': (context) => RegistraionPage(),
-      '/forgot': (context) => ForgotPassword(""),
-      '/dashboard': (context) => Dashboard(),
+      //'/forgot': (context) => ForgotPassword(""),
+      '/dashboard': (context) => Dashboard('',''),
+      //'/profile': (context) => MyProfile("","",0),
     },
     //home: MyHomePage(title: 'Flutter Demo Home Page'),
     debugShowCheckedModeBanner: false,

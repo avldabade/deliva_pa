@@ -17,7 +17,6 @@ import 'package:http/http.dart' as http;
 import '../constants/Constant.dart';
 
 class ResetPassword extends StatefulWidget {
-
   final String email;
 
   ResetPassword(this.email, {Key key}) : super(key: key);
@@ -46,6 +45,10 @@ class _ResetPasswordState extends State<ResetPassword> {
   //  _formKey and _autoValidate
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
+
+  bool isPasswordError = false;
+
+  bool isConPasswordError = false;
 
   @override
   void dispose() {
@@ -160,7 +163,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                                       padding: const EdgeInsets.only(
                                           top: 0.0, bottom: 24.0),
                                     ),
-                                    Row(
+                                    /*Row(
                                       children: <Widget>[
                                         Image(
                                           image: new AssetImage(
@@ -169,7 +172,9 @@ class _ResetPasswordState extends State<ResetPassword> {
                                           height: 16.0,
                                           //fit: BoxFit.fitHeight,
                                         ),
-                                        Container(width: 8.0,),
+                                        Container(
+                                          width: 8.0,
+                                        ),
                                         Expanded(
                                           child: TextFormField(
                                             controller: passwordController,
@@ -218,95 +223,255 @@ class _ResetPasswordState extends State<ResetPassword> {
                                           ),
                                         )
                                       ],
-                                    ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 0.0),
-                                      child: new Container(
-                                        height: 1.0,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    Row(
+                                    ),*/
+                                    Stack(
                                       children: <Widget>[
-                                        Image(
-                                          image: new AssetImage(
-                                              'assets/images/password_ic.png'),
-                                          width: 16.0,
-                                          height: 16.0,
-                                          //fit: BoxFit.fitHeight,
+                                        Positioned(
+                                          top: 0,
+                                          left: 0,
+                                          child: Text(
+                                            StringValues.TEXT_NEW_PASSWORD,
+                                            style: TextStyle(
+                                                color: Color(
+                                                    ColorValues.primaryColor),
+                                                fontSize: 17.0),
+                                          ),
                                         ),
-                                        Container(width: 8.0,),
-                                        Expanded(
-                                          child: TextFormField(
-                                            controller:
-                                                confirmPasswordController,
-                                            focusNode: _confirmPasswordFocus,
+                                        isPasswordError
+                                            ? Positioned(
+                                                right: 0.0,
+                                                bottom: 5.0,
+                                                //alignment: Alignment.bottomRight,
+                                                child: Image(
+                                                  image: new AssetImage(
+                                                      'assets/images/error_icon_red.png'),
+                                                  width: 16.0,
+                                                  height: 16.0,
+                                                  //fit: BoxFit.fitHeight,
+                                                ),
+                                              )
+                                            : Container(),
+                                        Theme(
+                                          data: Theme.of(context).copyWith(
+                                            primaryColor: Color(
+                                                ColorValues.text_view_theme),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 16.0),
+                                            child: TextFormField(
+                                              controller: passwordController,
+                                              focusNode: _passwordFocus,
 
-                                            keyboardType: TextInputType.text,
-                                            inputFormatters: [
-                                              BlacklistingTextInputFormatter(
-                                                  new RegExp('[\\ ]'))
-                                            ],
-                                            //to block space character
-                                            textInputAction:
-                                                TextInputAction.done,
-                                            //autofocus: true,
-                                            decoration: InputDecoration(
-                                              labelText: StringValues
-                                                  .TEXT_CONFIRM_PASSWORD,
-                                              hintText: StringValues
-                                                  .TEXT_CONFIRM_PASSWORD,
-                                              border: InputBorder.none,
+                                              keyboardType: TextInputType.text,
+                                              inputFormatters: [
+                                                BlacklistingTextInputFormatter(
+                                                    new RegExp('[\\ ]'))
+                                              ],
+                                              //to block space character
+                                              textInputAction:
+                                                  TextInputAction.next,
+                                              decoration: InputDecoration(
+                                                //contentPadding: EdgeInsets.all(0.0),
+                                                //errorStyle: TextStyle(),
+                                                prefixIcon: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 0.0),
+                                                  child: Transform.scale(
+                                                    scale: 0.65,
+                                                    child: IconButton(
+                                                      onPressed: () {},
+                                                      icon: new Image.asset(
+                                                          "assets/images/password_ic.png"),
+                                                    ),
+                                                  ),
+                                                ),
+                                                //icon: Icon(Icons.lock_outline),
+                                                suffixIcon: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 0.0),
+                                                  child: Transform.scale(
+                                                    scale: 0.65,
+                                                    child: IconButton(
+                                                      onPressed: _toggle,
+                                                      icon: Image.asset(_obscureText
+                                                          ? 'assets/images/eye.png'
+                                                          : 'assets/images/eye_cross.png'),
+                                                    ),
+                                                  ),
+                                                ),
+                                                counterText: '',
+                                                hintText:
+                                                    StringValues.TEXT_PASSWORD,
+                                                //hintStyle: TextStyle(),
+                                                //border: InputBorder.none,
+                                                focusedBorder:
+                                                    UnderlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color:
+                                                                Colors.grey)),
+                                                /*errorText:
+                                                                              submitFlag ? _validateEmail() : null,*/
+                                              ),
+
+                                              obscureText: _obscureText,
+                                              onFieldSubmitted: (_) {
+                                                Utils.fieldFocusChange(
+                                                    context,
+                                                    _passwordFocus,
+                                                    _confirmPasswordFocus);
+                                              },
+                                              validator: (String arg) {
+                                                String val =
+                                                    Validation.validatePassword(
+                                                        arg);
+                                                //setState(() {
+                                                if (val != null)
+                                                  isPasswordError = true;
+                                                else
+                                                  isPasswordError = false;
+                                                //});
+                                                return val;
+                                              },
+
+                                              onSaved: (value) {
+                                                _password = value;
+                                              },
                                             ),
-                                            obscureText: _obscureTextCon,
-                                            onFieldSubmitted: (_) {
-                                              _confirmPasswordFocus.unfocus();
-                                              validatePassword();
-                                            },
-                                            validator: (value) {
-                                              print(
-                                                  "val:: $value , _password:: ${passwordController.text.trim()}");
-                                              if (value.length < 6)
-                                                return StringValues
-                                                    .ENTER_VALID_PASSWORD;
-                                              if (value !=
-                                                  passwordController.text
-                                                      .trim())
-                                                return StringValues
-                                                    .PASSWORD_NOT_MATCH;
-                                              return null;
-                                              /*Validation
-                                                  .validateConfirmPassword(
-                                                  passwordController.text.trim(), value);*/
-                                            },
-                                            onSaved: (value) {
-                                              _confirmPassword = value;
-                                            },
                                           ),
                                         ),
-                                        SizedBox(
-                                          width: 35.0,
-                                          height: 35.0,
-                                          child: new IconButton(
-                                            onPressed: _toggleCon,
-                                            icon: Image.asset(_obscureTextCon
-                                                ? 'assets/images/eye.png'
-                                                : 'assets/images/eye_cross.png'),
-                                            //color:Color(ColorValues.yellow_light),
-                                            //iconSize: 24.0,
-                                          ),
-                                        )
                                       ],
                                     ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 50.0),
-                                      child: new Container(
-                                        height: 1.0,
-                                        color: Colors.grey,
-                                      ),
+                                    Container(
+                                      height: 16.0,
                                     ),
+                                    Stack(
+                                      children: <Widget>[
+                                        Positioned(
+                                          top: 0,
+                                          left: 0,
+                                          child: Text(
+                                            StringValues.TEXT_CONFIRM_PASSWORD,
+                                            style: TextStyle(
+                                                color: Color(
+                                                    ColorValues.primaryColor),
+                                                fontSize: 17.0),
+                                          ),
+                                        ),
+                                        isConPasswordError
+                                            ? Positioned(
+                                                right: 0.0,
+                                                bottom: 5.0,
+                                                //alignment: Alignment.bottomRight,
+                                                child: Image(
+                                                  image: new AssetImage(
+                                                      'assets/images/error_icon_red.png'),
+                                                  width: 16.0,
+                                                  height: 16.0,
+                                                  //fit: BoxFit.fitHeight,
+                                                ),
+                                              )
+                                            : Container(),
+                                        Theme(
+                                          data: Theme.of(context).copyWith(
+                                            primaryColor: Color(
+                                                ColorValues.text_view_theme),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 16.0),
+                                            child: TextFormField(
+                                              controller: confirmPasswordController,
+                                              focusNode: _confirmPasswordFocus,
+
+                                              keyboardType: TextInputType.text,
+                                              inputFormatters: [
+                                                BlacklistingTextInputFormatter(
+                                                    new RegExp('[\\ ]'))
+                                              ],
+                                              //to block space character
+                                              textInputAction:
+                                                  TextInputAction.done,
+                                              decoration: InputDecoration(
+                                                //contentPadding: EdgeInsets.all(0.0),
+                                                //errorStyle: TextStyle(),
+                                                prefixIcon: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 0.0),
+                                                  child: Transform.scale(
+                                                    scale: 0.65,
+                                                    child: IconButton(
+                                                      onPressed: () {},
+                                                      icon: new Image.asset(
+                                                          "assets/images/password_ic.png"),
+                                                    ),
+                                                  ),
+                                                ),
+                                                //icon: Icon(Icons.lock_outline),
+                                                suffixIcon: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 0.0),
+                                                  child: Transform.scale(
+                                                    scale: 0.65,
+                                                    child: IconButton(
+                                                      onPressed: _toggleCon,
+                                                      icon: Image.asset(_obscureTextCon
+                                                          ? 'assets/images/eye.png'
+                                                          : 'assets/images/eye_cross.png'),
+                                                    ),
+                                                  ),
+                                                ),
+                                                counterText: '',
+                                                hintText:
+                                                    StringValues.TEXT_PASSWORD,
+                                                //hintStyle: TextStyle(),
+                                                //border: InputBorder.none,
+                                                focusedBorder:
+                                                    UnderlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color:
+                                                                Colors.grey)),
+                                                /*errorText:
+                                                                              submitFlag ? _validateEmail() : null,*/
+                                              ),
+
+                                              obscureText: _obscureTextCon,
+                                              onFieldSubmitted: (_) {
+                                                _confirmPasswordFocus.unfocus();
+                                                validatePassword();
+                                              },
+                                              validator: (value) {
+                                                if (value.length < 6) {
+                                                  isConPasswordError=true;
+                                                  return StringValues
+                                                      .ENTER_VALID_PASSWORD;
+                                                }
+                                                if (value !=
+                                                    passwordController.text
+                                                        .trim()) {
+                                                  isConPasswordError=true;
+                                                  return StringValues
+                                                      .PASSWORD_NOT_MATCH;
+                                                }
+                                                isConPasswordError=false;
+                                                return null;
+                                                /*Validation
+                                                  .validateConfirmPassword(
+                                                  passwordController.text.trim(), value);*/
+                                              },
+                                              onSaved: (value) {
+                                                _confirmPassword = value;
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Container(height: 40.0,),
                                     SizedBox(
                                       width: 250.0,
                                       height: 52.0,
@@ -461,8 +626,6 @@ class _ResetPasswordState extends State<ResetPassword> {
       _isInProgress = true;
     });
 
-
-
     Map<String, dynamic> requestJson = {
       "email": widget.email,
       "newPassWord": Utils.encodeStringToBase64(_password),
@@ -517,7 +680,7 @@ class _ResetPasswordState extends State<ResetPassword> {
         Toast.show("${apiResponse.message}", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         //_navigateToLogin();
-      }else {
+      } else {
         print("statusCode error....");
         Toast.show("${apiResponse.message}", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
@@ -541,7 +704,7 @@ class _ResetPasswordState extends State<ResetPassword> {
   }
 
   void _navigateToLogin() {
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil('/loginEmail', (Route<dynamic> route) => false);
+    Navigator.of(context).pushNamedAndRemoveUntil(
+        '/loginOptions', (Route<dynamic> route) => false);
   }
 }

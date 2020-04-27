@@ -8,12 +8,13 @@ class ColorValues {
   //static const int accentColor = 0XFF187897;
   static const int accentColor = 0XFFFEC32D;
   static const int blueTheme = 0XFF187897;
-  static const int yellowTheme = 0XFF187897;
+  static const int yellowTheme = 0XFFFEC32D;
   static const int sea_blue = 0XFF2394BC;
   static const int black = 0XFF000000;
   static const int black_light = 0XFF6C6C6C;
   static const int sea_green_blue_light = 0XFF4C5669;
   static const int text_view_hint = 0XFF8A8D8D;
+  static const int text_view_theme = 0XFF8A8D8D;
   static const int text_green = 0XFF50BE0D;
   static const int text_red = 0XFFFF0606;
   static const int grey_light = 0XFF555555;
@@ -22,6 +23,13 @@ class ColorValues {
   static const int grey_light_header = 0XFF959292;
   static const int grey_light_text = 0XFF7A7B7D;
   static const int grey_light_divider = 0XFFCBCBCB;
+  static const int error_red = 0XFFF44336;
+  static const int password_text = 0XFFF5F5F5F;
+  static const int unselected_tab_text_color = 0XFFFC2C2C2;
+  static const int acceptedBidColorBlue = 0XFF007AEB;
+  static const int inTransitColorGreen = 0XFF2FB80C;
+  static const int greyTextColorLight = 0XFF999999;
+  static const int greyViewColor = 0XFFE6E9EB;
 
 
 

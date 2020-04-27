@@ -5,6 +5,8 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:deliva/constants/Constant.dart';
 import 'package:deliva/forgot_password/forgot_password.dart';
 import 'package:deliva/login/login.dart';
+import 'package:deliva/login/login_options.dart';
+import 'package:deliva/login/login_with_mobile.dart';
 import 'package:deliva/registration/my_profile.dart';
 import 'package:deliva/podo/api_response.dart';
 import 'package:deliva/registration/registration_otp.dart';
@@ -39,7 +41,7 @@ class _RegistrationState extends State<Registration> {
 
   NumberTextInputFormatter _phoneNumberFormatter = NumberTextInputFormatter(1);
 
-  bool _checkedValue = true;
+  bool _checkedValue = false;
 
   bool _isSubmitPressed = false;
 
@@ -50,6 +52,8 @@ class _RegistrationState extends State<Registration> {
   //  _formKey and _autoValidate
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
+
+  bool hasError=false;
 
   @override
   void initState() {
@@ -183,25 +187,36 @@ class _RegistrationState extends State<Registration> {
                                               padding:
                                                   const EdgeInsets.all(16.0),
                                               child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: <Widget>[
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.only(
                                                             top: 32.0,
                                                             bottom: 32.0),
-                                                    child: Text(
-                                                      StringValues
-                                                          .TEXT_REGISTRATION,
-                                                      style: TextStyle(
-                                                          color: Color(
-                                                              ColorValues
-                                                                  .accentColor),
-                                                          fontSize: 25.0),
+                                                    child: Center(
+                                                      child: Text(
+                                                        StringValues
+                                                            .TEXT_REGISTRATION,
+                                                        style: TextStyle(
+                                                            color: Color(
+                                                                ColorValues
+                                                                    .accentColor),
+                                                            fontSize: 25.0),
+                                                      ),
                                                     ),
                                                   ),
+                                                  Text(
+                                                    StringValues.TEXT_MOBILE_NO,
+                                                    style: TextStyle(
+                                                        color: Color(ColorValues
+                                                            .primaryColor),
+                                                        fontSize: 17.0),
+                                                  ),
                                                   Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
+                                                    mainAxisAlignment:MainAxisAlignment.start,
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
                                                     children: <Widget>[
                                                       CountryCodePicker(
                                                         onChanged:
@@ -257,7 +272,9 @@ class _RegistrationState extends State<Registration> {
                                                         height: 16.0,
                                                         //fit: BoxFit.fitHeight,
                                                       ),
-                                                      Container(width: 8.0,),
+                                                      Container(
+                                                        width: 8.0,
+                                                      ),
                                                       Expanded(
                                                         child: TextFormField(
                                                           controller:
@@ -282,12 +299,15 @@ class _RegistrationState extends State<Registration> {
                                                           decoration:
                                                               InputDecoration(
                                                             counterText: '',
-                                                            labelText: StringValues
-                                                                .TEXT_MOBILE_NO,
+                                                            //labelText: StringValues.TEXT_MOBILE_NO,
                                                             hintText: StringValues
                                                                 .TEXT_MOBILE_NO,
                                                             border: InputBorder
                                                                 .none,
+                                                            errorBorder:
+                                                                InputBorder
+                                                                    .none,
+                                                            errorText: null,
                                                             /*errorText:
                                                                           submitFlag ? _validateEmail() : null,*/
                                                           ),
@@ -297,11 +317,136 @@ class _RegistrationState extends State<Registration> {
                                                                 .unfocus();
                                                             _validate();
                                                           },
-                                                          validator: Validation
-                                                              .validateMobile,
+                                                          validator: (String arg) {
+                                                            String val=Validation.validateMobile(arg);
+                                                            //setState(() {
+                                                            if(val != null)
+                                                              hasError=true;
+                                                            else
+                                                              hasError=false;
+                                                            //});
+                                                            return val;
+                                                          },
                                                           onSaved: (value) {
                                                             _mobileNo = value;
                                                           },
+                                                          onChanged: (val){
+                                                            if(val.length > 9)
+                                                              hasError=false;
+                                                            else
+                                                              hasError=true;
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Stack(
+                                                    children: <Widget>[
+                                                      Padding(
+                                                        padding:
+                                                        const EdgeInsets.only(bottom: 10.0),
+                                                        child: new Container(
+                                                          height: 1.0,
+                                                          color: hasError?Color(ColorValues.error_red) :Colors.grey,
+                                                        ),
+                                                      ),
+                                                      Visibility(
+                                                        child: Align(
+                                                          alignment: Alignment.centerLeft,
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(top:5.0),
+                                                            child: Text(
+                                                              StringValues.ENTER_VALID_MOBILE_NO,
+                                                              style: TextStyle(color: Color(ColorValues.error_red),fontSize: 12.0),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        visible: hasError,
+                                                      ),
+                                                      hasError ? Positioned(
+                                                        right: 0.0,
+                                                        bottom: 0.0,
+                                                        //alignment: Alignment.bottomRight,
+                                                        child: Image(
+                                                          image: new AssetImage(
+                                                              'assets/images/error_icon_red.png'),
+                                                          width: 16.0,
+                                                          height: 16.0,
+                                                          //fit: BoxFit.fitHeight,
+                                                        ),
+                                                      ):Container(),
+                                                    ],
+                                                  ),
+                                                  hasError ? Container(height: 10.0,) : Container(),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: <Widget>[
+                                                      /*Checkbox(
+                                                        //checkColor: Color(ColorValues.sea_green_blue_light),
+                                                        //tristate: true,
+                                                        //activeColor: Color(ColorValues.white),
+                                                        value: _checkedValue,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            _checkedValue =
+                                                                value;
+                                                          });
+                                                        },
+                                                      ),*/
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            _checkedValue =
+                                                                !_checkedValue;
+                                                          });
+                                                        },
+                                                        child: Image(
+                                                          image: _checkedValue
+                                                              ? new AssetImage(
+                                                                  'assets/images/select_grey.png')
+                                                              : new AssetImage(
+                                                                  'assets/images/unselect_grey.png'),
+                                                          width: 26.0,
+                                                          height: 26.0,
+                                                          //fit: BoxFit.fitHeight,
+                                                        ),
+                                                      ),
+                                                      Expanded(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  left: 8.0),
+                                                          child: Row(
+                                                            children: <Widget>[
+                                                              Text(
+                                                                StringValues
+                                                                    .i_agree_to,
+                                                                style: TextStyle(
+                                                                    color: Color(
+                                                                        ColorValues
+                                                                            .text_view_hint),
+                                                                    fontSize:
+                                                                        14.0),
+                                                              ),
+                                                              Text(
+                                                                StringValues
+                                                                    .t_n_c,
+                                                                style: TextStyle(
+                                                                    decoration:
+                                                                        TextDecoration
+                                                                            .underline,
+                                                                    color: Color(
+                                                                        ColorValues
+                                                                            .text_view_hint),
+                                                                    fontSize:
+                                                                        14.0),
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
                                                       ),
                                                     ],
@@ -309,102 +454,40 @@ class _RegistrationState extends State<Registration> {
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.only(
-                                                            bottom: 24.0),
-                                                    child: new Container(
-                                                      height: 1.0,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ),
-                                                  Align(
-                                                    alignment:
-                                                        Alignment.centerLeft,
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
-                                                      children: <Widget>[
-                                                        /*Checkbox(
-                                                          //checkColor: Color(ColorValues.sea_green_blue_light),
-                                                          //tristate: true,
-                                                          //activeColor: Color(ColorValues.white),
-                                                          value: _checkedValue,
-                                                          onChanged: (value) {
-                                                            setState(() {
-                                                              _checkedValue =
-                                                                  value;
-                                                            });
-                                                          },
-                                                        ),*/
-                                                        GestureDetector(
-                                                          onTap: () {
-                                                            setState(() {
-                                                              _checkedValue =
-                                                              !_checkedValue;
-                                                            });
-                                                          },
-                                                          child: Image(
-                                                            image: _checkedValue
-                                                                ? new AssetImage(
-                                                                'assets/images/select_grey.png')
-                                                                : new AssetImage(
-                                                                'assets/images/unselect_grey.png'),
-                                                            width: 20.0,
-                                                            height: 20.0,
-                                                            //fit: BoxFit.fitHeight,
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(left:12.0),
-                                                          child: Text(
-                                                            StringValues
-                                                                .TEXT_AGREE_T_C,
-                                                            style: TextStyle(
-                                                                color: Color(
-                                                                    ColorValues
-                                                                        .text_view_hint),
-                                                                fontSize: 16.0),
-                                                          ),
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
                                                             bottom: 50.0),
                                                   ),
-                                                  SizedBox(
-                                                    width: 250.0,
-                                                    height: 52.0,
-                                                    child: RaisedButton(
-                                                      shape: new RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              new BorderRadius
-                                                                      .circular(
-                                                                  30.0),
-                                                          side: BorderSide(
-                                                              color: Color(
-                                                                  ColorValues
-                                                                      .yellow_light))),
-                                                      onPressed: () {
-                                                        _validate();
-                                                      },
-                                                      color: Color(ColorValues
-                                                          .yellow_light),
-                                                      textColor: Colors.white,
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(10.0),
-                                                        child: Text(
-                                                            StringValues
-                                                                .TEXT_VERIFY
-                                                                .toUpperCase(),
-                                                            style: TextStyle(
-                                                                fontSize:
-                                                                    20.0)),
+                                                  Center(
+                                                    child: SizedBox(
+                                                      width: 250.0,
+                                                      height: 52.0,
+                                                      child: RaisedButton(
+                                                        shape: new RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                new BorderRadius
+                                                                        .circular(
+                                                                    30.0),
+                                                            side: BorderSide(
+                                                                color: Color(
+                                                                    ColorValues
+                                                                        .yellow_light))),
+                                                        onPressed: () {
+                                                          _validate();
+                                                        },
+                                                        color: Color(ColorValues
+                                                            .yellow_light),
+                                                        textColor: Colors.white,
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10.0),
+                                                          child: Text(
+                                                              StringValues
+                                                                  .TEXT_VERIFY
+                                                                  .toUpperCase(),
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      20.0)),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -413,7 +496,7 @@ class _RegistrationState extends State<Registration> {
                                                         const EdgeInsets.only(
                                                             bottom: 50.0),
                                                   ),
-                                                 /* Text(
+                                                  /* Text(
                                                       StringValues
                                                           .TEXT_LOGIN_OTHER,
                                                       textAlign:
@@ -457,8 +540,6 @@ class _RegistrationState extends State<Registration> {
                                                             bottom: 24.0),
                                                   ),
                                                   */
-
-
                                                 ],
                                               ),
                                             ),
@@ -504,6 +585,10 @@ class _RegistrationState extends State<Registration> {
                 ),
               ),
               _isInProgress ? CommonWidgets.getLoader(context) : Container(),
+              WillPopScope(
+                onWillPop: onBackPressed,
+                child: Container(),
+              ),
             ],
           ),
         ),
@@ -518,26 +603,43 @@ class _RegistrationState extends State<Registration> {
     });
   }
 
-  void _navigateToLogin() {
-    Navigator.pop(context);
-  }
-
-  void _navigateToRegistrationOtp() {
-    Navigator.push(
+  Future _navigateToLogin() async {
+    final resultData = await Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-          builder: (context) => RegistrationOTP(_countryCode, _mobileNo,_checkedValue)),
+      MaterialPageRoute(builder: (context) => LoginOptions()),
     );
   }
 
-  void _navigateToMyProfile(int userId) {
-    Navigator.push(
+  Future _navigateToLoginMobile() async {
+    final resultData = await Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginMobile()),
+    );
+  }
+
+  Future _navigateToRegistrationOtp() async {
+    final resultData = await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) =>
+              RegistrationOTP(_countryCode, _mobileNo, _checkedValue)),
+    );
+    print('resultData:: $resultData');
+    if (resultData as int == Constants.popScreen)
+      Navigator.of(context).pop(Constants.popScreen);
+  }
+
+  /* Future _navigateToMyProfile(int userId) async {
+    final resultData = await Navigator.push(
       context,
       MaterialPageRoute(
           builder: (context) => MyProfile(_countryCode, _mobileNo, userId)),
     );
+    print('_navigateToMyProfile resultData:: $resultData');
+    if(resultData as int == Constants.popScreen)
+      Navigator.of(context).pop(Constants.popScreen);
   }
-
+*/
   Future _validate() async {
     print("_isSubmitPressed:: $_isSubmitPressed");
     if (!_isSubmitPressed) {
@@ -649,7 +751,11 @@ class _RegistrationState extends State<Registration> {
             _navigateToRegistrationOtp();
           } else if (apiResponse.resourceData.isRegistrationComplete ==
               "false") {
-            _navigateToMyProfile(apiResponse.resourceData.userId);
+            //_navigateToMyProfile(apiResponse.resourceData.userId);
+            _navigateToLoginMobile();
+            Toast.show("User is already exist, Please login complete profile.",
+                context,
+                duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
           }
         } else if (apiResponse.status == 409) {
           print("${apiResponse.message}");
@@ -694,7 +800,7 @@ class _RegistrationState extends State<Registration> {
     }
   }
 
-  void _validateInputs() {
+ /* void _validateInputs() {
     if (_formKey.currentState.validate()) {
 //    If all data are correct then save data to out variables
       _formKey.currentState.save();
@@ -716,5 +822,31 @@ class _RegistrationState extends State<Registration> {
       });
       _isSubmitPressed = false;
     }
+  }*/
+  void _validateInputs() {
+    if (Validation.validateMobile(
+        mobileNoController.text) ==
+        null) {
+      setState(() {
+        this.hasError = false;
+      });
+      callGetOtpApi();
+    } else {
+      setState(() {
+        this.hasError = true;
+      });
+      _isSubmitPressed = false;
+    }
+  }
+
+  Future<bool> onBackPressed() async {
+    //print('onBackPressed called');
+    Navigator.of(context).pop();
+    /*final resultData = await Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginOptions()),
+    );
+    return true;
+  */
   }
 }

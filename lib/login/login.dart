@@ -648,8 +648,8 @@ class _LoginState extends State<Login> {
   }
 
   Future validateLogin() async {
-    var currentLocation= await Utils.getCurrentLocation();
-    print("currentLocation::: $currentLocation");
+    //var currentLocation= await Utils.getCurrentLocation();
+    //print("currentLocation::: $currentLocation");
     print("validateLogin....");
     if (!_isSubmitPressed) {
       try {
@@ -784,7 +784,7 @@ class _LoginState extends State<Login> {
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       } else {
         print("statusCode error....");
-        Toast.show("error code::: ${response.statusCode}", context,
+        Toast.show("${response.statusCode}", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       }
     } on SocketException catch (e) {

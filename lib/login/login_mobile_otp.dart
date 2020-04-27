@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -44,19 +45,36 @@ class _LoginMobileOTPState extends State<LoginMobileOTP> {
 
   bool _isSubmitPressed=false;
 
+  Timer _timer;
+  int _start = Constants.OTP_TIMER;
   @override
   void dispose() {
     // TODO: implement dispose
     controller.dispose();
+    _timer.cancel();
     super.dispose();
   }
 @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    startTimer();
   }
-
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+      oneSec,
+          (Timer timer) => setState(
+            () {
+          if (_start < 1) {
+            timer.cancel();
+          } else {
+            _start = _start - 1;
+          }
+        },
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -150,11 +168,17 @@ class _LoginMobileOTPState extends State<LoginMobileOTP> {
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                                   child: Text(
-                                    StringValues.otp_screen_msg,
+                                    StringValues.otp_screen_msg_mobile,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                         color: Color(ColorValues.text_view_hint),
                                         fontSize: 16.0),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top:40.0,bottom: 30.0),
+                                  child: Text('$_start ${StringValues.sec}',
+                                    style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 20.0,fontWeight: FontWeight.w600),
                                   ),
                                 ),
                                 PinCodeTextField(
@@ -163,11 +187,11 @@ class _LoginMobileOTPState extends State<LoginMobileOTP> {
                                   controller: controller,
                                   hideCharacter: false,
                                   highlight: true,
-                                  highlightColor: Color(ColorValues.yellow_light),
+                                  highlightColor: Color(ColorValues.grey_light_divider),
                                   //Colors.blue,
-                                  defaultBorderColor: Color(ColorValues.grey_hint_color),
+                                  defaultBorderColor: Color(ColorValues.grey_light_divider),
                                   //Colors.black,
-                                  hasTextBorderColor: Color(ColorValues.grey_hint_color),
+                                  hasTextBorderColor: Color(ColorValues.grey_light_divider),
                                   //Colors.green,
                                   errorBorderColor: Color(ColorValues.text_red),
                                   maxLength: pinLength,
@@ -194,13 +218,30 @@ class _LoginMobileOTPState extends State<LoginMobileOTP> {
                                 ),
                                 Visibility(
                                   child: Text(
-                                    "Wrong PIN!",
+                                    StringValues.wrongOTP,
                                     style: TextStyle(color: Colors.red),
                                   ),
                                   visible: hasError,
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.only(bottom: 30.0),
+                                  padding: const EdgeInsets.only(bottom: 20.0),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    if(_start == 0){
+                                      callGetLoginOtpApi();
+                                    }
+                                  },
+                                  child: Text(
+                                    StringValues.TEXT_RESEND_CODE,
+                                    style: TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      color: _start != 0 ? Color(ColorValues.text_view_hint) : Color(ColorValues.blueTheme),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 40.0),
                                 ),
                                 SizedBox(
                                   width: 250.0,
@@ -222,21 +263,8 @@ class _LoginMobileOTPState extends State<LoginMobileOTP> {
                                     ),
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 40.0),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    callGetLoginOtpApi();
-                                  },
-                                  child: Text(
-                                    StringValues.TEXT_RESEND_CODE,
-                                    style: TextStyle(
-                                      decoration: TextDecoration.underline,
-                                      color: Color(ColorValues.sea_blue),
-                                    ),
-                                  ),
-                                )
+
+
                               ],
                             ),
                           ),
@@ -370,6 +398,14 @@ class _LoginMobileOTPState extends State<LoginMobileOTP> {
               SharedPreferencesHelper.USER_PASSWORD, encodedPassword);
           Toast.show("User logged in successfully.", context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+
+          //==============================
+          SharedPreferencesHelper.setPrefString(
+              SharedPreferencesHelper.mobileNo, widget.mobileNo);
+          SharedPreferencesHelper.setPrefString(
+              SharedPreferencesHelper.countryCode, widget.countryCode);
+          //===============================
+
           _performLogin();
         } else if (jsonResponseMap.containsKey("error")) {
           Toast.show("${loginResponse.errorDescription}", context,
@@ -409,11 +445,12 @@ class _LoginMobileOTPState extends State<LoginMobileOTP> {
   Future _performLogin() async {
     // This is just a demo, so no actual login here.
     //_saveLoginState();
-    final result =
-    await Navigator.of(context).pushReplacementNamed('/dashboard');
-    setState(() {
-      print('result:::: $result');
-    });
+    /*final result =
+    await Navigator.of(context).pushReplacementNamed('/dashboard');*/
+    return Navigator.of(context)
+        .pushNamedAndRemoveUntil('/dashboard',
+            (Route<dynamic> route) => false);
+
   }
 
   void callGetLoginOtpApi() async {
@@ -445,19 +482,20 @@ class _LoginMobileOTPState extends State<LoginMobileOTP> {
         _isInProgress = false;
       });
       _isSubmitPressed = false;
-
+      final Map jsonResponseMap = json.decode(response.body);
+      //final jsonResponse = json.decode(response.body);
+      print('jsonResponse::::: ${jsonResponseMap.toString()}');
+      //ResponsePodo responsePodo = new ResponsePodo.fromJson(jsonResponseMap);
+      APIResponse loginResponse =
+      new APIResponse.fromJson(jsonResponseMap);
       if (response.statusCode == 200) {
         print("statusCode 200....");
 
-        final Map jsonResponseMap = json.decode(response.body);
-        //final jsonResponse = json.decode(response.body);
-        print('jsonResponse::::: ${jsonResponseMap.toString()}');
-        //ResponsePodo responsePodo = new ResponsePodo.fromJson(jsonResponseMap);
-        APIResponse loginResponse =
-        new APIResponse.fromJson(jsonResponseMap);
-        if (loginResponse.status == 200) {// success condition
 
-          Toast.show("User OTP sent successfully.", context,
+        if (loginResponse.status == 200) {// success condition
+          _start=Constants.OTP_TIMER;
+          startTimer();
+          Toast.show(loginResponse.responseMessage, context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
 
         } else if (jsonResponseMap.containsKey("error")) {

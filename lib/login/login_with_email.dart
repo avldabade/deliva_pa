@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:deliva/forgot_password/forgot_password.dart';
+import 'package:deliva/login/login_options.dart';
 import 'package:deliva/podo/login_response.dart';
 import 'package:deliva/podo/response_podo.dart';
 import 'package:deliva/registration/registration.dart';
@@ -21,6 +22,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:country_code_picker/country_code_picker.dart';
 
+//enum LoginEmailError { GALLERY, CAMERA, CANCEL }
 class LoginEmail extends StatefulWidget {
   @override
   _LoginEmailState createState() => _LoginEmailState();
@@ -51,6 +53,9 @@ class _LoginEmailState extends State<LoginEmail> {
   //  _formKey and _autoValidate
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
+
+  static bool isEmailError = false;
+  static bool isPasswordError = false;
 
   @override
   void dispose() {
@@ -168,16 +173,19 @@ class _LoginEmailState extends State<LoginEmail> {
                                             margin: EdgeInsets.only(top: 50.0),
                                           ),
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             mainAxisSize: MainAxisSize.max,
                                             children: <Widget>[
                                               IconButton(
                                                 icon: new Icon(
                                                   Icons.arrow_back_ios,
-                                                  color: Color(ColorValues.white),
+                                                  color:
+                                                      Color(ColorValues.white),
                                                 ),
                                                 onPressed: () {
-                                                  Navigator.pop(context);
+                                                  //Navigator.pop(context);
+                                                  onBackPressed();
                                                 },
                                               ),
                                               Text(
@@ -221,168 +229,312 @@ class _LoginEmailState extends State<LoginEmail> {
                                               padding:
                                                   const EdgeInsets.all(16.0),
                                               child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: <Widget>[
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.only(
                                                             top: 16.0,
                                                             bottom: 32.0),
-                                                    child: Text(
-                                                      StringValues.TEXT_LOGIN,
-                                                      style: TextStyle(
-                                                          color: Color(
+                                                    child: Center(
+                                                      child: Text(
+                                                        StringValues.TEXT_LOGIN,
+                                                        style: TextStyle(
+                                                            color: Color(
+                                                                ColorValues
+                                                                    .accentColor),
+                                                            fontSize: 25.0),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Stack(
+                                                    children: <Widget>[
+                                                      Positioned(
+                                                        top: 0,
+                                                        left: 0,
+                                                        child: Text(
+                                                          StringValues
+                                                              .TEXT_EMAIL,
+                                                          style: TextStyle(
+                                                              color: Color(
+                                                                  ColorValues
+                                                                      .primaryColor),
+                                                              fontSize: 17.0),
+                                                        ),
+                                                      ),
+                                                      isEmailError
+                                                          ? Positioned(
+                                                              right: 0.0,
+                                                              bottom: 5.0,
+                                                              //alignment: Alignment.bottomRight,
+                                                              child: Image(
+                                                                image: new AssetImage(
+                                                                    'assets/images/error_icon_red.png'),
+                                                                width: 16.0,
+                                                                height: 16.0,
+                                                                //fit: BoxFit.fitHeight,
+                                                              ),
+                                                            )
+                                                          : Container(),
+                                                      Theme(
+                                                        data: Theme.of(context)
+                                                            .copyWith(
+                                                          primaryColor: Color(
                                                               ColorValues
-                                                                  .accentColor),
-                                                          fontSize: 25.0),
-                                                    ),
-                                                  ),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    children: <Widget>[
-                                                      Image(
-                                                        image: new AssetImage(
-                                                            'assets/images/email_icon.png'),
-                                                        width: 16.0,
-                                                        height: 16.0,
-                                                        //fit: BoxFit.fitHeight,
-                                                      ),
-                                                      Container(width: 8.0,),
-                                                      Expanded(
-                                                        child: TextFormField(
-                                                          controller:
-                                                              emailController,
-                                                          focusNode:
-                                                              _emailFocus,
-                                                          keyboardType:
-                                                              TextInputType
-                                                                  .emailAddress,
-                                                          //maxLength: 13,
-                                                          /*inputFormatters: [
-                                                            WhitelistingTextInputFormatter
-                                                                .digitsOnly,
-                                                            // Fit the validating format.
-                                                            //_phoneNumberFormatter,
-                                                          ],*/
-                                                          //to block space character
-                                                          textInputAction:
-                                                              TextInputAction
-                                                                  .next,
+                                                                  .text_view_theme),
+                                                        ),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  top: 16.0),
+                                                          child: SizedBox(
+                                                            height: 65.0,
+                                                            child:
+                                                                TextFormField(
+                                                              controller:
+                                                                  emailController,
+                                                              focusNode:
+                                                                  _emailFocus,
+                                                              keyboardType:
+                                                                  TextInputType
+                                                                      .emailAddress,
+                                                              textInputAction:
+                                                                  TextInputAction
+                                                                      .next,
 
-                                                          //autofocus: true,
-                                                          decoration:
-                                                              InputDecoration(
-                                                            counterText: '',
-                                                            labelText: StringValues
-                                                                .TEXT_EMAIL,
-                                                            hintText: StringValues
-                                                                .TEXT_EMAIL,
-                                                            border: InputBorder
-                                                                .none,
-                                                            /*errorText:
-                                                                            submitFlag ? _validateEmail() : null,*/
+                                                              //autofocus: true,
+                                                              decoration:
+                                                                  InputDecoration(
+                                                                //contentPadding: EdgeInsets.all(0.0),
+                                                                helperText: ' ',
+                                                                prefixIcon:
+                                                                    Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          0.0),
+                                                                  child:
+                                                                      Transform
+                                                                          .scale(
+                                                                    scale: 0.65,
+                                                                    child:
+                                                                        IconButton(
+                                                                      onPressed:
+                                                                          () {},
+                                                                      icon: new Image
+                                                                              .asset(
+                                                                          "assets/images/email_icon.png"),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                //icon: Icon(Icons.lock_outline),
+                                                                counterText: '',
+                                                                //labelText: StringValues.TEXT_EMAIL,
+                                                                hintText:
+                                                                    StringValues
+                                                                        .TEXT_EMAIL,
+                                                                //border: InputBorder.none,
+                                                                focusedBorder: UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                            color:
+                                                                                Colors.grey)),
+                                                                /*errorText:
+                                                                                submitFlag ? _validateEmail() : null,*/
+                                                              ),
+
+                                                              onFieldSubmitted:
+                                                                  (_) {
+                                                                Utils.fieldFocusChange(
+                                                                    context,
+                                                                    _emailFocus,
+                                                                    _passwordFocus);
+                                                              },
+                                                              validator:
+                                                                  (String arg) {
+                                                                String val =
+                                                                    Validation
+                                                                        .isEmail(
+                                                                            arg);
+                                                                //setState(() {
+                                                                if (val != null)
+                                                                  isEmailError =
+                                                                      true;
+                                                                else
+                                                                  isEmailError =
+                                                                      false;
+                                                                //});
+                                                                return val;
+                                                              },
+                                                              onSaved: (value) {
+                                                                //print('email value:: $value');
+                                                                _email = value;
+                                                              },
+                                                            ),
                                                           ),
-                                                          onFieldSubmitted:
-                                                              (_) {
-                                                            Utils.fieldFocusChange(
-                                                                context,
-                                                                _emailFocus,
-                                                                _passwordFocus);
-                                                          },
-                                                          validator: Validation
-                                                              .isEmail,
-                                                          onSaved: (value) {
-                                                            _email = value;
-                                                          },
                                                         ),
                                                       ),
                                                     ],
                                                   ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 0.0),
-                                                    child: new Container(
-                                                      height: 1.0,
-                                                      color: Colors.grey,
-                                                    ),
+                                                  Container(
+                                                    height: 8.0,
                                                   ),
-                                                  Row(
+                                                  Stack(
                                                     children: <Widget>[
-                                                      Image(
-                                                        image: new AssetImage(
-                                                            'assets/images/password_ic.png'),
-                                                        width: 16.0,
-                                                        height: 16.0,
-                                                        //fit: BoxFit.fitHeight,
+                                                      Positioned(
+                                                        top: 0,
+                                                        left: 0,
+                                                        child: Text(
+                                                          StringValues
+                                                              .TEXT_PASSWORD,
+                                                          style: TextStyle(
+                                                              color: Color(
+                                                                  ColorValues
+                                                                      .primaryColor),
+                                                              fontSize: 17.0),
+                                                        ),
                                                       ),
-                                                      Container(width: 8.0,),
-                                                      Expanded(
-                                                        child: TextFormField(
-                                                          controller:
-                                                              passwordController,
-                                                          focusNode:
-                                                              _passwordFocus,
+                                                      isPasswordError
+                                                          ? Positioned(
+                                                              right: 0.0,
+                                                              bottom: 5.0,
+                                                              //alignment: Alignment.bottomRight,
+                                                              child: Image(
+                                                                image: new AssetImage(
+                                                                    'assets/images/error_icon_red.png'),
+                                                                width: 16.0,
+                                                                height: 16.0,
+                                                                //fit: BoxFit.fitHeight,
+                                                              ),
+                                                            )
+                                                          : Container(),
+                                                      Theme(
+                                                        data: Theme.of(context)
+                                                            .copyWith(
+                                                          primaryColor: Color(
+                                                              ColorValues
+                                                                  .text_view_theme),
+                                                        ),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  top: 16.0),
+                                                          child: SizedBox(
+                                                            height: 65.0,
+                                                            child: TextFormField(
+                                                              controller:
+                                                                  passwordController,
+                                                              focusNode:
+                                                                  _passwordFocus,
 
-                                                          keyboardType:
-                                                              TextInputType
-                                                                  .text,
-                                                          inputFormatters: [
-                                                            BlacklistingTextInputFormatter(
-                                                                new RegExp(
-                                                                    '[\\ ]'))
-                                                          ],
-                                                          //to block space character
-                                                          textInputAction:
-                                                              TextInputAction
-                                                                  .done,
-                                                          //autofocus: true,
-                                                          decoration:
-                                                              InputDecoration(
-                                                            labelText: StringValues
-                                                                .TEXT_PASSWORD,
-                                                            hintText: StringValues
-                                                                .TEXT_PASSWORD,
-                                                            border: InputBorder
-                                                                .none,
+                                                              keyboardType:
+                                                                  TextInputType
+                                                                      .text,
+                                                              inputFormatters: [
+                                                                BlacklistingTextInputFormatter(
+                                                                    new RegExp(
+                                                                        '[\\ ]'))
+                                                              ],
+                                                              //to block space character
+                                                              textInputAction:
+                                                                  TextInputAction
+                                                                      .done,
+                                                              decoration:
+                                                                  InputDecoration(
+                                                                //contentPadding: EdgeInsets.all(0.0),
+                                                                //errorStyle: TextStyle(),
+                                                                    helperText: ' ',
+                                                                prefixIcon:
+                                                                    Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .only(
+                                                                          left:
+                                                                              0.0),
+                                                                  child: Transform
+                                                                      .scale(
+                                                                    scale: 0.65,
+                                                                    child:
+                                                                        IconButton(
+                                                                      onPressed:
+                                                                          () {},
+                                                                      icon: new Image
+                                                                              .asset(
+                                                                          "assets/images/password_ic.png"),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                //icon: Icon(Icons.lock_outline),
+                                                                suffixIcon:
+                                                                    Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .only(
+                                                                          right:
+                                                                              0.0),
+                                                                  child: Transform
+                                                                      .scale(
+                                                                    scale: 0.65,
+                                                                    child:
+                                                                        IconButton(
+                                                                      onPressed:
+                                                                          _toggle,
+                                                                      icon: Image.asset(_obscureText
+                                                                          ? 'assets/images/eye.png'
+                                                                          : 'assets/images/eye_cross.png'),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                counterText: '',
+                                                                hintText: StringValues
+                                                                    .TEXT_PASSWORD,
+                                                                //hintStyle: TextStyle(),
+                                                                //border: InputBorder.none,
+                                                                focusedBorder: UnderlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                            color:
+                                                                                Colors.grey)),
+                                                                /*errorText:
+                                                                                submitFlag ? _validateEmail() : null,*/
+                                                              ),
+
+                                                              obscureText:
+                                                                  _obscureText,
+                                                              onFieldSubmitted:
+                                                                  (value) {
+                                                                _passwordFocus
+                                                                    .unfocus();
+                                                                validateLogin();
+                                                              },
+                                                              validator:
+                                                                  (String arg) {
+                                                                String val =
+                                                                    Validation
+                                                                        .validatePassword(
+                                                                            arg);
+                                                                //setState(() {
+                                                                if (val != null)
+                                                                  isPasswordError =
+                                                                      true;
+                                                                else
+                                                                  isPasswordError =
+                                                                      false;
+                                                                //});
+                                                                return val;
+                                                              },
+
+                                                              onSaved: (value) {
+                                                                _password = value;
+                                                              },
+                                                            ),
                                                           ),
-                                                          obscureText:
-                                                              _obscureText,
-                                                          onFieldSubmitted:
-                                                              (value) {
-                                                            _passwordFocus
-                                                                .unfocus();
-                                                            validateLogin();
-                                                          },
-                                                          validator: Validation
-                                                              .validatePassword,
-                                                          onSaved: (value) {
-                                                            _password = value;
-                                                          },
                                                         ),
                                                       ),
-                                                      SizedBox(
-                                                        width: 35.0,
-                                                        height: 35.0,
-                                                        child: new IconButton(
-                                                          onPressed: _toggle,
-                                                          icon: Image.asset(_obscureText
-                                                              ? 'assets/images/eye.png'
-                                                              : 'assets/images/eye_cross.png'),
-                                                          //color:Color(ColorValues.yellow_light),
-                                                          //iconSize: 24.0,
-                                                        ),
-                                                      )
                                                     ],
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            bottom: 0.0),
-                                                    child: new Container(
-                                                      height: 1.0,
-                                                      color: Colors.grey,
-                                                    ),
                                                   ),
                                                   Row(
                                                     mainAxisAlignment:
@@ -420,14 +572,14 @@ class _LoginEmailState extends State<LoginEmail> {
                                                           padding:
                                                               const EdgeInsets
                                                                       .only(
-                                                                  top: 16.0),
+                                                                  top: 4.0),
                                                           child: Text(
                                                             StringValues
                                                                 .TEXT_FORGOT,
                                                             style: TextStyle(
                                                                 color: Color(
                                                                     ColorValues
-                                                                        .blueTheme),
+                                                                        .password_text),
                                                                 fontSize: 16.0),
                                                           ),
                                                         ),
@@ -439,36 +591,39 @@ class _LoginEmailState extends State<LoginEmail> {
                                                         const EdgeInsets.only(
                                                             bottom: 50.0),
                                                   ),
-                                                  SizedBox(
-                                                    width: 250.0,
-                                                    height: 52.0,
-                                                    child: RaisedButton(
-                                                      shape: new RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              new BorderRadius
-                                                                      .circular(
-                                                                  30.0),
-                                                          side: BorderSide(
-                                                              color: Color(
-                                                                  ColorValues
-                                                                      .yellow_light))),
-                                                      onPressed: () {
-                                                        print("Login....");
-                                                        validateLogin();
-                                                      },
-                                                      color: Color(ColorValues
-                                                          .yellow_light),
-                                                      textColor: Colors.white,
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(10.0),
-                                                        child: Text(
-                                                            StringValues
-                                                                .TEXT_LOGIN
-                                                                .toUpperCase(),
-                                                            style: TextStyle(
-                                                                fontSize: 20)),
+                                                  Center(
+                                                    child: SizedBox(
+                                                      width: 250.0,
+                                                      height: 52.0,
+                                                      child: RaisedButton(
+                                                        shape: new RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                new BorderRadius
+                                                                        .circular(
+                                                                    30.0),
+                                                            side: BorderSide(
+                                                                color: Color(
+                                                                    ColorValues
+                                                                        .yellow_light))),
+                                                        onPressed: () {
+                                                          print("Login....");
+                                                          validateLogin();
+                                                        },
+                                                        color: Color(ColorValues
+                                                            .yellow_light),
+                                                        textColor: Colors.white,
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10.0),
+                                                          child: Text(
+                                                              StringValues
+                                                                  .TEXT_LOGIN
+                                                                  .toUpperCase(),
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      20)),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -527,6 +682,10 @@ class _LoginEmailState extends State<LoginEmail> {
                     )
                   : Container(),*/
               _isInProgress ? CommonWidgets.getLoader(context) : Container(),
+              WillPopScope(
+                onWillPop: onBackPressed,
+                child: Container(),
+              ),
             ],
           ),
         ),
@@ -545,8 +704,7 @@ class _LoginEmailState extends State<LoginEmail> {
     _email = emailController.text.trim();
     Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => ForgotPassword(_email)),
+      MaterialPageRoute(builder: (context) => ForgotPassword(_email)),
     );
   }
 
@@ -555,6 +713,16 @@ class _LoginEmailState extends State<LoginEmail> {
       context,
       MaterialPageRoute(builder: (context) => Registration()),
     );
+  }
+
+  Future<bool> onBackPressed() async {
+    //print('onBackPressed called');
+    Navigator.of(context).pop();
+    /*final resultData = await Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginOptions()),
+    );
+    return true;*/
   }
 
   Widget showProgress() {
@@ -591,8 +759,6 @@ class _LoginEmailState extends State<LoginEmail> {
   }
 
   Future validateLogin() async {
-    var currentLocation= await Utils.getCurrentLocation();
-    print("currentLocation::: $currentLocation");
     print("validateLogin....");
     if (!_isSubmitPressed) {
       try {
@@ -620,7 +786,8 @@ class _LoginEmailState extends State<LoginEmail> {
 
   void callLoginApi() async {
     String encodedPassword = Utils.encodeStringToBase64(_password);
-    print("login _password::: $_password \n_email:: $_email \n_countryCode::: $_countryCode ");
+    print(
+        "login _password::: $_password \n_email:: $_email \n_countryCode::: $_countryCode ");
     print("login encodedPassword::: $encodedPassword");
     if (!mounted) return;
     setState(() {
@@ -640,7 +807,7 @@ class _LoginEmailState extends State<LoginEmail> {
         Constants.LOGIN_API +
         //"?grant_type=password&username=1234567890&password=ZHVtbXkxMjM=&countryCode=91&roleId=2";
         '?grant_type=password&username=$_email&password=$encodedPassword&countryCode=$_countryCode&roleId=${Constants.ROLE_ID}&loginBy=${Constants.loginByEmail}';
-        //"?grant_type=password&username=$_email&password=$encodedPassword&countryCode=$_countryCode&roleId=${Constants.ROLE_ID}&loginBy=${Constants.loginByMobile}";
+    //"?grant_type=password&username=$_email&password=$encodedPassword&countryCode=$_countryCode&roleId=${Constants.ROLE_ID}&loginBy=${Constants.loginByMobile}";
     try {
       http.Response response = await http.post(dataURL,
           headers: headers, body: json.encode(requestJson));
@@ -664,9 +831,11 @@ class _LoginEmailState extends State<LoginEmail> {
           SharedPreferencesHelper.setPrefString(
               SharedPreferencesHelper.ACCESS_TOKEN, loginResponse.accessToken);
           SharedPreferencesHelper.setPrefString(
-              SharedPreferencesHelper.AWS_ACCESS_KEY, loginResponse.awsAccessKeyId);
+              SharedPreferencesHelper.AWS_ACCESS_KEY,
+              loginResponse.awsAccessKeyId);
           SharedPreferencesHelper.setPrefString(
-              SharedPreferencesHelper.AWS_SECRET_KEY, loginResponse.awsSecretAccessKey);
+              SharedPreferencesHelper.AWS_SECRET_KEY,
+              loginResponse.awsSecretAccessKey);
           SharedPreferencesHelper.setPrefBool(
               SharedPreferencesHelper.IS_LOGGED_IN, true);
           SharedPreferencesHelper.setPrefString(
@@ -735,11 +904,15 @@ class _LoginEmailState extends State<LoginEmail> {
   Future _performLogin() async {
     // This is just a demo, so no actual login here.
     //_saveLoginState();
-    final result =
-        await Navigator.of(context).pushReplacementNamed('/dashboard');
-    setState(() {
+    /*final result =
+        await Navigator.of(context).pushReplacementNamed('/dashboard');*/
+
+    return Navigator.of(context)
+        .pushNamedAndRemoveUntil('/dashboard', (Route<dynamic> route) => false);
+
+    /* setState(() {
       print('result:::: $result');
-    });
+    });*/
   }
 
   void _validateInputs() {

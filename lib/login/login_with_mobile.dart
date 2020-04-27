@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:deliva/forgot_password/forgot_password.dart';
 import 'package:deliva/login/login_mobile_otp.dart';
+import 'package:deliva/login/login_options.dart';
 import 'package:deliva/podo/api_response.dart';
 import 'package:deliva/podo/login_response.dart';
 import 'package:deliva/podo/response_podo.dart';
@@ -50,6 +51,8 @@ class _LoginMobileState extends State<LoginMobile> {
   //  _formKey and _autoValidate
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
+
+  var hasError=false;
 
   @override
   void dispose() {
@@ -102,7 +105,7 @@ class _LoginMobileState extends State<LoginMobile> {
                             child: Padding(
                               padding: EdgeInsets.only(
                                   bottom:
-                                      MediaQuery.of(context).viewInsets.bottom),
+                                  MediaQuery.of(context).viewInsets.bottom),
                               child: Container(
                                 child: Stack(
                                   children: <Widget>[
@@ -141,7 +144,8 @@ class _LoginMobileState extends State<LoginMobile> {
                                                   color: Color(ColorValues.white),
                                                 ),
                                                 onPressed: () {
-                                                  Navigator.pop(context);
+                                                  //Navigator.pop(context);
+                                                  onBackPressed();
                                                 },
                                               ),
                                               Text(
@@ -170,7 +174,7 @@ class _LoginMobileState extends State<LoginMobile> {
                                       //, bottom: 90.0),
                                       shape: RoundedRectangleBorder(
                                         borderRadius:
-                                            BorderRadius.circular(16.0),
+                                        BorderRadius.circular(16.0),
                                       ),
                                       child: Form(
                                         key: _formKey,
@@ -178,38 +182,42 @@ class _LoginMobileState extends State<LoginMobile> {
                                         child: SingleChildScrollView(
                                           child: Container(
                                             width: MediaQuery.of(context)
-                                                    .size
-                                                    .width -
+                                                .size
+                                                .width -
                                                 48.0,
                                             child: Padding(
                                               padding:
-                                                  const EdgeInsets.all(16.0),
+                                              const EdgeInsets.all(16.0),
                                               child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: <Widget>[
                                                   Padding(
                                                     padding:
-                                                        const EdgeInsets.only(
-                                                            top: 16.0,
-                                                            bottom: 32.0),
-                                                    child: Text(
-                                                      StringValues.TEXT_LOGIN,
-                                                      style: TextStyle(
-                                                          color: Color(
-                                                              ColorValues
-                                                                  .accentColor),
-                                                          fontSize: 25.0),
+                                                    const EdgeInsets.only(
+                                                        top: 16.0,
+                                                        bottom: 32.0),
+                                                    child: Center(
+                                                      child: Text(
+                                                        StringValues.TEXT_LOGIN,
+                                                        style: TextStyle(
+                                                            color: Color(
+                                                                ColorValues
+                                                                    .accentColor),
+                                                            fontSize: 25.0),
+                                                      ),
                                                     ),
                                                   ),
+                                                  Text(StringValues.TEXT_MOBILE_NO,style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 17.0),),
                                                   Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
+                                                    mainAxisAlignment:MainAxisAlignment.start,
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
                                                     children: <Widget>[
                                                       CountryCodePicker(
                                                         onChanged:
-                                                            _onCountryChange,
+                                                        _onCountryChange,
                                                         // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
                                                         initialSelection:
-                                                            '+$_countryCode',
+                                                        '+$_countryCode',
                                                         favorite: [
                                                           'IN',
                                                           '+39',
@@ -220,11 +228,11 @@ class _LoginMobileState extends State<LoginMobile> {
                                                         showFlag: false,
                                                         // optional. Shows only country name and flag when popup is closed.
                                                         showOnlyCountryWhenClosed:
-                                                            false,
+                                                        false,
                                                         // optional. aligns the flag and the Text left
                                                         alignLeft: false,
                                                         padding:
-                                                            EdgeInsets.all(0),
+                                                        EdgeInsets.all(0),
                                                         flagWidth: 25.0,
                                                         //Get the country information relevant to the initial selection
                                                         onInit: (code) {
@@ -237,7 +245,7 @@ class _LoginMobileState extends State<LoginMobile> {
                                                               "Country on init: " +
                                                                   codeA[1]);
                                                           _countryCode =
-                                                              codeA[1];
+                                                          codeA[1];
                                                         },
                                                       ),
                                                       Container(
@@ -248,8 +256,8 @@ class _LoginMobileState extends State<LoginMobile> {
                                                       ),
                                                       Padding(
                                                           padding:
-                                                              EdgeInsets.only(
-                                                                  left: 5.0)),
+                                                          EdgeInsets.only(
+                                                              left: 5.0)),
                                                       Image(
                                                         image: new AssetImage(
                                                             'assets/images/phone_icon.png'),
@@ -261,12 +269,12 @@ class _LoginMobileState extends State<LoginMobile> {
                                                       Expanded(
                                                         child: TextFormField(
                                                           controller:
-                                                              mobileNoController,
+                                                          mobileNoController,
                                                           focusNode:
-                                                              _mobileNoFocus,
+                                                          _mobileNoFocus,
                                                           keyboardType:
-                                                              TextInputType
-                                                                  .phone,
+                                                          TextInputType
+                                                              .phone,
                                                           maxLength: 13,
                                                           inputFormatters: [
                                                             WhitelistingTextInputFormatter
@@ -285,14 +293,15 @@ class _LoginMobileState extends State<LoginMobile> {
 
                                                           //autofocus: true,
                                                           decoration:
-                                                              InputDecoration(
+                                                          InputDecoration(
                                                             counterText: '',
-                                                            labelText: StringValues
-                                                                .TEXT_MOBILE_NO,
+                                                            //labelText: StringValues.TEXT_MOBILE_NO,
                                                             hintText: StringValues
                                                                 .TEXT_MOBILE_NO,
                                                             border: InputBorder
                                                                 .none,
+                                                            errorText: null,
+                                                            errorBorder: InputBorder.none,
                                                             /*errorText:
                                                                             submitFlag ? _validateEmail() : null,*/
                                                           ),
@@ -302,62 +311,109 @@ class _LoginMobileState extends State<LoginMobile> {
                                                                 .unfocus();
                                                             validateLogin();
                                                           },
-                                                          validator: Validation
-                                                              .validateMobile,
+                                                          validator: (String arg) {
+                                                            String val=Validation.validateMobile(arg);
+                                                            //setState(() {
+                                                            if(val != null)
+                                                              hasError=true;
+                                                            else
+                                                              hasError=false;
+                                                            //});
+                                                            return val;
+                                                          },
                                                           onSaved: (value) {
                                                             _mobileNo = value;
+                                                          },
+                                                          onChanged: (val){
+                                                            if(val.length > 9)
+                                                              hasError=false;
+                                                            else
+                                                              hasError=true;
                                                           },
                                                         ),
                                                       ),
                                                     ],
                                                   ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            bottom: 50.0),
-                                                    child: new Container(
-                                                      height: 1.0,
-                                                      color: Colors.grey,
-                                                    ),
+
+                                                  Stack(
+                                                    children: <Widget>[
+                                                      Padding(
+                                                        padding:
+                                                        const EdgeInsets.only(bottom: 10.0),
+                                                        child: new Container(
+                                                          height: 1.0,
+                                                          color: hasError?Color(ColorValues.error_red) :Colors.grey,
+                                                        ),
+                                                      ),
+                                                      Visibility(
+                                                        child: Align(
+                                                          alignment: Alignment.centerLeft,
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(top:5.0),
+                                                            child: Text(
+                                                              StringValues.ENTER_VALID_MOBILE_NO,
+                                                              style: TextStyle(color: Color(ColorValues.error_red),fontSize: 12.0),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        visible: hasError,
+                                                      ),
+                                                      hasError ? Positioned(
+                                                        right: 0.0,
+                                                        bottom: 0.0,
+                                                        //alignment: Alignment.bottomRight,
+                                                        child: Image(
+                                                          image: new AssetImage(
+                                                              'assets/images/error_icon_red.png'),
+                                                          width: 16.0,
+                                                          height: 16.0,
+                                                          //fit: BoxFit.fitHeight,
+                                                        ),
+                                                      ):Container(),
+                                                    ],
                                                   ),
 
-                                                  SizedBox(
-                                                    width: 250.0,
-                                                    height: 52.0,
-                                                    child: RaisedButton(
-                                                      shape: new RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              new BorderRadius
-                                                                      .circular(
-                                                                  30.0),
-                                                          side: BorderSide(
-                                                              color: Color(
-                                                                  ColorValues
-                                                                      .yellow_light))),
-                                                      onPressed: () {
-                                                        print("Login....");
-                                                        validateLogin();
-                                                      },
-                                                      color: Color(ColorValues
-                                                          .yellow_light),
-                                                      textColor: Colors.white,
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(10.0),
-                                                        child: Text(
-                                                            StringValues
-                                                                .TEXT_LOGIN
-                                                                .toUpperCase(),
-                                                            style: TextStyle(
-                                                                fontSize: 20)),
+                                                  Container(height:40.0),
+
+                                                  Center(
+                                                    child: SizedBox(
+                                                      width: 250.0,
+                                                      height: 52.0,
+                                                      child: RaisedButton(
+                                                        shape: new RoundedRectangleBorder(
+                                                            borderRadius:
+                                                            new BorderRadius
+                                                                .circular(
+                                                                30.0),
+                                                            side: BorderSide(
+                                                                color: Color(
+                                                                    ColorValues
+                                                                        .yellow_light))),
+                                                        onPressed: () {
+                                                          print("Login....");
+                                                          validateLogin();
+                                                        },
+                                                        color: Color(ColorValues
+                                                            .yellow_light),
+                                                        textColor: Colors.white,
+                                                        child: Padding(
+                                                          padding:
+                                                          const EdgeInsets
+                                                              .all(10.0),
+                                                          child: Text(
+                                                              StringValues
+                                                                  .TEXT_LOGIN
+                                                                  .toUpperCase(),
+                                                              style: TextStyle(
+                                                                  fontSize: 20)),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
                                                   Padding(
                                                     padding:
-                                                        const EdgeInsets.only(
-                                                            bottom: 50.0),
+                                                    const EdgeInsets.only(
+                                                        bottom: 50.0),
                                                   ),
 
                                                 ],
@@ -410,6 +466,10 @@ class _LoginMobileState extends State<LoginMobile> {
                     )
                   : Container(),*/
               _isInProgress ? CommonWidgets.getLoader(context) : Container(),
+              WillPopScope(
+                onWillPop: onBackPressed,
+                child: Container(),
+              ),
             ],
           ),
         ),
@@ -447,7 +507,7 @@ class _LoginMobileState extends State<LoginMobile> {
           new Opacity(
             opacity: 0.9,
             child:
-                const ModalBarrier(dismissible: false, color: Colors.black54),
+            const ModalBarrier(dismissible: false, color: Colors.black54),
           ),
           new Dialog(
             child: Padding(
@@ -474,9 +534,7 @@ class _LoginMobileState extends State<LoginMobile> {
   }
 
   Future validateLogin() async {
-    var currentLocation= await Utils.getCurrentLocation();
-    print("currentLocation::: $currentLocation");
-    print("validateLogin....");
+
     if (!_isSubmitPressed) {
       try {
         _isSubmitPressed = true;
@@ -518,9 +576,9 @@ class _LoginMobileState extends State<LoginMobile> {
     };
     String dataURL = Constants.BASE_URL +
         Constants.LOGIN_OTP_API +
-    '?mobile=$_mobileNo&countryCode=$_countryCode&roleId=${Constants.ROLE_ID}';
-        //"?grant_type=password&username=1234567890&password=ZHVtbXkxMjM=&countryCode=91&roleId=2";
-        //"?grant_type=password&username=$_mobileNo&password=$encodedPassword&countryCode=$_countryCode&roleId=${Constants.ROLE_ID}";
+        '?mobile=$_mobileNo&countryCode=$_countryCode&roleId=${Constants.ROLE_ID}';
+    //"?grant_type=password&username=1234567890&password=ZHVtbXkxMjM=&countryCode=91&roleId=2";
+    //"?grant_type=password&username=$_mobileNo&password=$encodedPassword&countryCode=$_countryCode&roleId=${Constants.ROLE_ID}";
     try {
       http.Response response = await http.post(dataURL,
           headers: headers, body: json.encode(requestJson));
@@ -530,35 +588,35 @@ class _LoginMobileState extends State<LoginMobile> {
         _isInProgress = false;
       });
       _isSubmitPressed = false;
-
+      final Map jsonResponseMap = json.decode(response.body);
+      //final jsonResponse = json.decode(response.body);
+      print('jsonResponse::::: ${jsonResponseMap.toString()}');
+      //ResponsePodo responsePodo = new ResponsePodo.fromJson(jsonResponseMap);
+      APIResponse loginResponse =
+      new APIResponse.fromJson(jsonResponseMap);
       if (response.statusCode == 200) {
         print("statusCode 200....");
 
-        final Map jsonResponseMap = json.decode(response.body);
-        //final jsonResponse = json.decode(response.body);
-        print('jsonResponse::::: ${jsonResponseMap.toString()}');
-        //ResponsePodo responsePodo = new ResponsePodo.fromJson(jsonResponseMap);
-        APIResponse loginResponse =
-            new APIResponse.fromJson(jsonResponseMap);
+
         if (loginResponse.status == 200) {// success condition
 
-          Toast.show("User OTP sent successfully.", context,
+          Toast.show(loginResponse.responseMessage, context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
           _navigateToLoginOTP();
 
         } else if (jsonResponseMap.containsKey("error")) {
-          Toast.show("${loginResponse.errorDescription}", context,
+          Toast.show("${loginResponse.responseMessage}", context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         }
       } else if (response.statusCode == 400) {
-        Toast.show(StringValues.ERROR_LOGIN, context,
+        Toast.show(loginResponse.responseMessage, context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       } else if (response.statusCode == 401) {
-        Toast.show(StringValues.ERROR_LOGIN_NOT_REGISTERED, context,
+        Toast.show(loginResponse.responseMessage, context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       } else {
         print("statusCode error....");
-        Toast.show("error code::: ${response.statusCode}", context,
+        Toast.show("error code::: ${loginResponse.responseMessage}", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       }
     } on SocketException catch (e) {
@@ -582,7 +640,7 @@ class _LoginMobileState extends State<LoginMobile> {
   }
 
 
-  void _validateInputs() {
+ /* void _validateInputs() {
     if (_formKey.currentState.validate()) {
 //    If all data are correct then save data to out variables
       _formKey.currentState.save();
@@ -594,5 +652,31 @@ class _LoginMobileState extends State<LoginMobile> {
       });
       _isSubmitPressed = false;
     }
+  }*/
+  void _validateInputs() {
+    if (Validation.validateMobile(
+        mobileNoController.text) ==
+        null) {
+      setState(() {
+        this.hasError = false;
+      });
+      callLoginOTPApi();
+    } else {
+      setState(() {
+        this.hasError = true;
+      });
+      _isSubmitPressed = false;
+    }
+  }
+
+  Future<bool> onBackPressed() async {
+    //print('onBackPressed called');
+    Navigator.of(context).pop();
+    /*final resultData = await Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginOptions()),
+    );
+    return true;*/
+
   }
 }

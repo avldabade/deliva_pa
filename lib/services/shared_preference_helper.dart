@@ -18,6 +18,8 @@ class SharedPreferencesHelper {
   static final String USER_ID = "userid";
   static final String IS_PROFILE_COMPLETE = "isProfileComplete";
   static final String JIT = "jti";
+  static final String mobileNo = "mobileNo";
+  static final String countryCode = "countryCode";
 
   static final String _kLanguageCode = "language";
   static final String USER_EMAIL = "userEmail";

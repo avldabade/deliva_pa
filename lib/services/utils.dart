@@ -132,7 +132,7 @@ class Utils {
         SharedPreferencesHelper.IS_LOGGED_IN, false);
     SharedPreferencesHelper.setPrefBool(
         SharedPreferencesHelper.IS_LOGGED_OUT, true);
-
+    SharedPreferencesHelper.setPrefBool(SharedPreferencesHelper.IS_PROFILE_COMPLETE, false);
     SharedPreferencesHelper.setPrefString(
         SharedPreferencesHelper.ACCESS_TOKEN, '');
     SharedPreferencesHelper.removeKey(SharedPreferencesHelper.ACCESS_TOKEN);
@@ -305,18 +305,33 @@ class Utils {
     print('randomNo::: $randomNo');
     return randomNo;
   }
-  static double convertInchToCM(double num){
-    print('convertInchToCM num:: $num');
-    if(num != 0){
-    double numConverted=num*2.54;
-    //numConverted.round();
-    print('convertInchToCM numConverted:: $numConverted');
-    return numConverted;
+  static String convertInchToCM(String number){
+    if(number != '' && number != null){
+      double num=double.parse(number);
+      print('convertInchToCM num:: $num');
+
+      double numConverted=num*2.54;
+      numConverted=double.parse((numConverted).toStringAsFixed(2));
+      print('convertInchToCM numConverted:: ${numConverted}');
+      return '${numConverted.toString()}';
     }
     else
-    return 0;
+    return "";
   }
-  static double convertCMTOInch(double num){
+  static String convertCMTOInch(String number){
+    if(number != '' && number != null){
+      double num=double.parse(number);
+      print('convertInchToCM num:: $num');
+
+      double numConverted=num/2.54;
+      numConverted=double.parse((numConverted).toStringAsFixed(2));
+      print('convertInchToCM numConverted:: ${numConverted}');
+      return '${numConverted.toString()}';
+    }
+    else
+    return "";
+  }
+/*  static double convertCMTOInch(double num){
     print('convertInchToCM num:: $num');
     if(num != 0){
     double numConverted=num/2.54;
@@ -324,5 +339,15 @@ class Utils {
     return numConverted;
     }
     return 0;
-  }
+  }*/
+
+//static double screenHeight = MediaQuery.of(context).size.height;
+
+void callLogout(BuildContext context){
+  saveLogoutState();
+  Navigator.of(context).pushNamedAndRemoveUntil(
+      '/loginOptions', (Route<dynamic> route) => false);
+}
+
+
 }

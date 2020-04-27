@@ -14,6 +14,7 @@ import 'package:flutter/services.dart';
 import 'package:toast/toast.dart';
 import 'package:http/http.dart' as http;
 
+
 class LocationSelector extends StatefulWidget {
   final String title;
   final String locationMsg;
@@ -328,8 +329,6 @@ class _LocationSelectorState extends State<LocationSelector> {
   }
 
   Future<List<PAResourceData>> getLocations() async {
-    print("getLocations::::: ");
-    //if (!mounted) return;
     setState(() {
       _isInProgress = true;
     });
@@ -427,8 +426,8 @@ class _LocationSelectorState extends State<LocationSelector> {
                 right: 0.0,
                 child: Padding(
                   padding: const EdgeInsets.all(0.0),
-                  child: Text('0.4 Mile',
-                  style: TextStyle(color: Color(ColorValues.accentColor),fontSize: 16.0),
+                  child: Text(data.distance,
+                  style: TextStyle(color: Color(ColorValues.blueTheme),fontSize: 16.0),
                   ),
                 ),
               ),
@@ -443,7 +442,7 @@ class _LocationSelectorState extends State<LocationSelector> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 5.0),
-                      child: Text(data.email,
+                      child: Text(data.businessName,
                         style: TextStyle(fontSize: 14.0,
                         color: Color(ColorValues.grey_light),
                         ),
@@ -519,8 +518,8 @@ class _LocationSelectorState extends State<LocationSelector> {
                 right: 0.0,
                 child: Padding(
                   padding: const EdgeInsets.all(0.0),
-                  child: Text('0.4 Mile',
-                    style: TextStyle(color: Color(ColorValues.accentColor),fontSize: 16.0),
+                  child: Text(data.distance,
+                    style: TextStyle(color: Color(ColorValues.blueTheme),fontSize: 16.0),
                   ),
                 ),
               ),
@@ -535,7 +534,7 @@ class _LocationSelectorState extends State<LocationSelector> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 5.0),
-                      child: Text(data.email,
+                      child: Text(data.businessName,
                         style: TextStyle(fontSize: 14.0,
                           color: Color(ColorValues.grey_light),
                         ),
@@ -612,14 +611,6 @@ class _LocationSelectorState extends State<LocationSelector> {
       );
     } else {
       return Container();
-      /*Center(child: SizedBox(
-          width: MediaQuery.of(context).size.width-150,
-          //height: MediaQuery.of(context).size.width -100,
-          child: Image.asset(
-            'assets/images/value.png',
-            fit: BoxFit.cover,
-          )),
-      );*/
     }
   }
 

@@ -11,6 +11,7 @@ class StringValues {
   static final String TEXT_LOGIN_OTHER = 'Or \nContinue with';
   static final String TEXT_MOBILE_NO = 'Mobile Number';
   static final String TEXT_PASSWORD = 'Password';
+  static final String TEXT_NEW_PASSWORD = 'New Password';
   static final String TEXT_CONFIRM_PASSWORD = 'Confirm Password';
   static final String TEXT_REMEMBER = 'Remember';
   static final String TEXT_FORGOT = 'Forgot Password?';
@@ -18,7 +19,7 @@ class StringValues {
   static final String TEXT_REGISTER_NOW = 'Register Now';
   static final String TEXT_SUBMIT = 'SUBMIT';
   static final String TEXT_SAVE = 'SAVE';
-  static final String TEXT_RESEND_CODE = 'Resend code';
+  static final String TEXT_RESEND_CODE = 'Resend OTP';
   static final String TEXT_ENTER_OTP = 'ENTER OTP';
   static final String TEXT_ALREDY_MEMBER = 'Already a member?';
   static final String TEXT_LOGIN_NOW = 'Login Now';
@@ -52,6 +53,9 @@ class StringValues {
   static final String TEXT_HELP = 'Help';
   static final String TEXT_TERMS_POLICY = 'Terms & Policy';
   static final String TEXT_LOGOUT = 'Logout';
+  static final String TEXT_LOGOUT_ask = 'Logout ?';
+  static final String TEXT_YES = 'Yes';
+  static final String TEXT_NO = 'No';
   static final String TEXT_SELECT_IMAGE = 'Select Image';
 
 
@@ -92,7 +96,7 @@ class StringValues {
   static final String ENTER_VALID_NAME = 'Name must be more than 2 charater';
   static final String ENTER_VALID_ADDRESS = 'Address must be more than 2 charater';
   static final String ENTER_VALID_PASSWORD =
-      'Password length should be minimum 6 characters';
+      'Should be minimum 6 characters';
   static final String PASSWORD_NOT_MATCH = 'Confirm password does not match';
   static final String CURRENT_PASSWORD_NOT_MATCH = 'You have entered wrong Current password.';
   static final String TEXT_NO_INTERNET = 'No Internet!!';
@@ -126,10 +130,14 @@ class StringValues {
   static String weight = "Weight";
   static String value = "Value";
   static String readyDate = "Package Drop- off date at OPC";
+  static String readyDateError = "Select Package Drop- off date at OPC";
   static String deliverDate = "Expected Delivery Date at DPC";
+  static String deliverDateError = "Select Expected Delivery Date at DPC";
   static String description = "Description";
-  static String insurance = "Insurance";
+  static String insurance = "Opt for the insurance";
   static String agree_t_n_c = "I agree to Terms & Conditions.";
+  static String i_agree_to = "I agree to ";
+  static String t_n_c = "Terms & Conditions.";
   static String save_publish = "PUBLISH FOR BID";
   static String selectPALocation = "Please Select Processing Agent location near by you";
   static String getDirection = "Get Directions";
@@ -144,6 +152,7 @@ class StringValues {
   static String imageUploadSuccess = "Image uploaded successfully";
   static String alertDeliverySuccessTitle = "Your Delivery Request is Published Successfully";
   static String alertDeliverySuccessDescMsg = "Your Delivery Request is Published Successfully";
+  static String sec = "Sec";
 
   static String welcomeDeliva = "Welcome to Deliva";
   static String emailLogin = "Login with email";
@@ -151,7 +160,44 @@ class StringValues {
   static String facebook = "Facebook";
   static String google = "Google";
   static String otp_screen_msg = "Enter One Time Pass-code sent to your registered email address";
+  static String otp_screen_msg_mobile = "Enter One Time Pass-code sent to your Mobile number";
+  static String select_picture = "Select Picture";
+  static String LBS = "LBS";
+  static String GRAM = "GM";
+  static String KG = "KG";
+  static String source_error = "Select Source";
+  static String destination_error = "Select Destination";
+  static String ready_date_error = "Select Ready Date";
+  static String dekivery_date_error = "Select Delivery Date";
 
 
+//--------------------- home customer tab------------------
+
+  static String active = "Active";
+  static String Published = "Published";
+  static String Draft = "Draft";
+  static String OPC = "OPC";
+  static String DA = "DA";
+  static String DPC = "DPC";
+  static String RC = "RC";
+  static String new_request = "Create New Request";
+  static String delivery_request = "Delivery Requests";
+  static String dropOffOpaLabel = 'Drop off to OPA before: ';
+  static String processingAgentLabel = 'Processing Agent: ';
+  static String deliveryAgentLabel = 'Delivery Agent: ';
+  static String destinationLabel = 'Destination: ';
+  static String deliveryBeforeLabel = 'Deliver before: ';
+  static String expectedDeliveryDateLabel = 'Expected Delivery Date: ';
+  static String bid = 'Bid';
+  static String edit = 'Edit';
+  static String delete = 'Delete';
+  static String publish = 'Publish';
+  static String accepted_bid = 'ACCEPTED_BID';//ACCEPTED_BID, IN_TRANSIT,DELIVERED
+  static String show_accepted_bid = 'Accepted Bid';//ACCEPTED_BID, IN_TRANSIT,DELIVERED
+  static String inTransit = 'IN_TRANSIT';
+  static String show_inTransit = 'In Transit';
+  static String delivered = 'DELIVERED';
+  static String show_delivered = 'Delivered';
+  static String wrongOTP="Wrong OTP";
 
 }

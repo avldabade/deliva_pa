@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:deliva/constants/Constant.dart';
 import 'package:deliva/forgot_password/forgot_otp.dart';
 import 'package:deliva/login/login.dart';
 import 'package:deliva/login/login_options.dart';
@@ -23,8 +24,13 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Timer(
         Duration(seconds: 3),
-            () => Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (BuildContext context) => LoginOptions())));
+            () async {
+              final resultData = await Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (BuildContext context) => LoginOptions()));
+              print('resultData:: $resultData');
+              if(resultData as int == Constants.popScreen)
+                Navigator.of(context).pop(Constants.popScreen);
+            });
   }
 
   @override

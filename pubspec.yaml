@@ -106,6 +106,7 @@ flutter:
       - assets/images/user_img_with_edit.png
       - assets/images/user_img.png
       - assets/images/fly_icon.png
+
       - assets/images/source_destination_img.png
       - assets/images/source.png
       - assets/images/destination.png
@@ -134,6 +135,24 @@ flutter:
       - assets/images/name_icon.png
       - assets/images/location_ic.png
       - assets/images/img_cross_icon.png
+      - assets/images/gallery.png
+      - assets/images/camera_picker.png
+      - assets/images/action_bar_header_yellow.png
+      - assets/images/add_more_request.png
+      - assets/images/circle_grey.png
+      - assets/images/line_horizontal_grey.png
+      - assets/images/line_horizontal_selected.png
+      - assets/images/home_add_requesr.png
+      - assets/images/add_package.png
+      - assets/images/error_icon_red.png
+      - assets/images/phone_black.png
+      - assets/images/location_OPC.png
+      - assets/images/edit_green.png
+      - assets/images/publish_yellow.png
+      - assets/images/delete_red.png
+
+
+      #- assets/images/name_icon_home.png
 
 
   fonts:

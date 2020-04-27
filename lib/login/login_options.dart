@@ -206,7 +206,7 @@ class _LoginOptionsState extends State<LoginOptions> {
                                                     fit: BoxFit.cover,
                                                   ),
                                                 ),
-                                                GestureDetector(
+                                                /*GestureDetector(
                                                   onTap: (){
                                                     //validateMyProfile();
                                                     //getAlertDialog(context);
@@ -248,7 +248,7 @@ class _LoginOptionsState extends State<LoginOptions> {
                                                       ],
                                                     ),
                                                   ),
-                                                ),
+                                                ),*/
                                                 Padding(
                                                   padding:
                                                   const EdgeInsets.only(
@@ -323,6 +323,8 @@ class _LoginOptionsState extends State<LoginOptions> {
                   ],
                 ),
               ),
+              //WillPopScope(child: Container(), onWillPop: callPopFun),
+              //WillPopCallback
             ],
           ),
         ),
@@ -331,22 +333,37 @@ class _LoginOptionsState extends State<LoginOptions> {
   }
 
 
-  void _navigateToRegistration() {
-    Navigator.push(
+  Future _navigateToRegistration() async {
+
+    final resultData = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => Registration()),
     );
+    print('resultData:: $resultData');
+    /*if(resultData as int == Constants.popScreen)
+      Navigator.of(context).pop(Constants.popScreen);*/
   }
-  void _navigateToLoginWithEmail() {
-    Navigator.push(
+  Future _navigateToLoginWithEmail() async {
+    final resultData = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => LoginEmail()),
     );
+    print('resultData:: $resultData');
+    /*if(resultData as int == Constants.popScreen)
+      Navigator.of(context).pop(Constants.popScreen);*/
   }
-  void _navigateToLoginWithMobile() {
-    Navigator.push(
+  Future _navigateToLoginWithMobile() async {
+    final resultData = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => LoginMobile()),
     );
+    /*if(resultData as int == Constants.popScreen)
+      Navigator.of(context).pop(Constants.popScreen);*/
   }
+
+  /*Future<bool> callPopFun() async {
+    print('callPOp called');
+    await Navigator.of(context).pop();
+    return true;
+  }*/
 }

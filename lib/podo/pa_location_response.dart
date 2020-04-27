@@ -41,45 +41,45 @@ class PALocationResponse {
 
 class PAResourceData {
   String country;
+  String address;
+  String distance;
   String city;
   String name;
-  String mobile;
+  String businessName;
   String state;
   int userId;
-  String profileImageUrl;
-  String email;
 
   PAResourceData(
       {this.country,
+        this.address,
+        this.distance,
         this.city,
         this.name,
-        this.mobile,
+        this.businessName,
         this.state,
-        this.userId,
-        this.profileImageUrl,
-        this.email});
+        this.userId});
 
   PAResourceData.fromJson(Map<String, dynamic> json) {
     country = json['country'];
+    address = json['address'];
+    distance = json['distance'];
     city = json['city'];
     name = json['name'];
-    mobile = json['mobile'];
+    businessName = json['businessName'];
     state = json['state'];
     userId = json['userId'];
-    profileImageUrl = json['profileImageUrl'];
-    email = json['email'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['country'] = this.country;
+    data['address'] = this.address;
+    data['distance'] = this.distance;
     data['city'] = this.city;
     data['name'] = this.name;
-    data['mobile'] = this.mobile;
+    data['businessName'] = this.businessName;
     data['state'] = this.state;
     data['userId'] = this.userId;
-    data['profileImageUrl'] = this.profileImageUrl;
-    data['email'] = this.email;
     return data;
   }
 }
