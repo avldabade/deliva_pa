@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.apurva.deliva.deliva">
+    package="com.apurva.deliva_pa.deliva_pa">
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
@@ -10,10 +10,14 @@
         "android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name=
         "android.permission.ACCESS_FINE_LOCATION"/>
+
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="deliva"
-        android:icon="@mipmap/ic_launcher">
+        android:label="Deliva_PA"
+        android:icon="@drawable/appstore">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCxa30b5GZrzVDrwcpsIoO6kWp28LVCRbI" />
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

@@ -1,4 +1,4 @@
-package com.apurva.deliva.deliva;
+package com.apurva.deliva_pa.deliva_pa;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

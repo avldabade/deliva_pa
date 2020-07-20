@@ -1,8 +1,8 @@
 
 import 'package:country_code_picker/country_code_picker.dart';
-import 'package:deliva/services/validation_textfield.dart';
-import 'package:deliva/values/ColorValues.dart';
-import 'package:deliva/values/StringValues.dart';
+import 'package:deliva_pa/services/validation_textfield.dart';
+import 'package:deliva_pa/values/ColorValues.dart';
+import 'package:deliva_pa/values/StringValues.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -63,7 +63,7 @@ class _TextFormDemoState extends State<TextFormDemo> {
                       alignLeft: false,
                       padding:
                       EdgeInsets.all(0),
-                      flagWidth: 25.0,
+                    //  flagWidth: 25.0,
                       //Get the country information relevant to the initial selection
                       onInit: (code) {
                         print(
@@ -85,14 +85,14 @@ class _TextFormDemoState extends State<TextFormDemo> {
                     //border:OutlineInputBorder(),
 
                 ),
-                onChanged: (text) {
+             /*   onChanged: (text) {
                   // DEFINE YOUR RULES HERE
                   setState(() {
                     text.contains("1")
                         ? isError = true
                         : isError = false;
                   });
-                },
+                },*/
               ),
               isError ? Align(
                 alignment: Alignment.centerRight,

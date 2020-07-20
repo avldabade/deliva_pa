@@ -1,4 +1,4 @@
-name: deliva
+name: deliva_pa
 description: A new Flutter project.
 
 # The following defines the version and build number for your application.
@@ -27,13 +27,13 @@ dependencies:
   #keyboard_actions: ^3.2.1
   pin_code_text_field: ^1.5.1
   #country_pickers: ^1.2.0
-  country_code_picker: ^1.3.7
-  http: ^0.12.0+4
+  country_code_picker: 1.2.4
+  http:
   shared_preferences:
-  package_info: ^0.4.0+12
-  dio: ^3.0.9
+  package_info:
+  dio: 1.0.3
   toast: ^0.1.5
-  flutter_spinkit: ^4.1.2+1
+  flutter_spinkit: ^3.0.0
   #auto_size_text: ^2.1.0
   location: ^2.4.0
   geocoder: ^0.2.1
@@ -41,7 +41,14 @@ dependencies:
   #amazon_s3_cognito: ^0.2.4
   #aws_client: ^0.2.0
   amazon_cognito_identity_dart: ^0.0.22
-  async: ^2.3.0
+  async: ^2.0.8
+  intl: ^0.16.1
+  url_launcher:
+  flutter_rating_bar: ^3.0.1+1
+  google_maps_flutter: 
+  geolocator: ^5.1.5
+  flutter_dash: ^0.0.1
+  flutter_slidable: ^0.5.4
 
 dev_dependencies:
   flutter_test:
@@ -60,35 +67,27 @@ flutter:
   uses-material-design: true
 
   assets:
+      - assets/thankyou.png
+      - assets/congrates.png
+
       - assets/images/logo.png
-      - assets/images/splash_bottom.png
-      - assets/images/btn_rounder_rectangle.png
       - assets/images/left_black_arrow.png
+      - assets/images/back_arrow_white.png
       - assets/images/forgot_img.png
       - assets/images/otp_img.png
       - assets/images/reset_img.png
-      - assets/images/plus.png
-      - assets/images/header_bg_rectangle.png
+
+
       - assets/images/header_bg_center.png
       - assets/images/header_waves_center.png
       - assets/images/header_bg_black.png
       - assets/images/header_only_leaf.png
       - assets/images/profile_img_girl.png
-      - assets/images/action_bar_header.png
+
       - assets/images/location_icon.png
-      - assets/images/step_2.png
-      - assets/images/splash.png
-      - assets/images/toggle_switch.png
+      - assets/images/splash_orange.png
       - assets/images/eye_cross.png
       - assets/images/eye.png
-      - assets/images/bottom_alert_img.png
-      - assets/images/top_alert_img.png
-      - assets/images/facebook_btn_elips.png
-      - assets/images/google_btn_eclips.png
-      - assets/images/drawer_bg_yello.png
-      - assets/images/drawer_bg_full_yello.png
-      - assets/images/drawer_bg_blue.png
-      - assets/images/drawer_bg_full_blue.png
       - assets/images/search_icon.png
       - assets/images/bell_icon.png
       - assets/images/history_icon.png
@@ -99,17 +98,9 @@ flutter:
       - assets/images/term_n_policy_icon.png
       - assets/images/logout_icon.png
       - assets/images/drawer_menu_icon.png
-      - assets/images/dashboard_header_bg.png
-      - assets/images/dashboard_header_bg_blue.png
-      - assets/images/dashboard_header_bg_yellow.png
-
       - assets/images/user_img_with_edit.png
       - assets/images/user_img.png
       - assets/images/fly_icon.png
-
-      - assets/images/source_destination_img.png
-      - assets/images/source.png
-      - assets/images/destination.png
       - assets/images/direction_icon.png
       - assets/images/width.png
       - assets/images/height.png
@@ -117,16 +108,15 @@ flutter:
       - assets/images/weight.png
       - assets/images/length.png
       - assets/images/value.png
-      - assets/images/plus_add.png
       - assets/images/check_mark.png
       - assets/images/select_checkbox.png
       - assets/images/unselect_checkbox.png
       - assets/images/select_grey.png
       - assets/images/unselect_grey.png
       - assets/images/down_arrow.png
-      - assets/images/add_img.png
+
       - assets/images/location_yello.png
-      - assets/images/cloud_img.png
+      - assets/images/edit_profile_dash.png
       - assets/images/phone_icon.png
       - assets/images/email_icon.png
       - assets/images/login_with_email.png
@@ -135,21 +125,102 @@ flutter:
       - assets/images/name_icon.png
       - assets/images/location_ic.png
       - assets/images/img_cross_icon.png
+      - assets/images/img_cross_icon_old.png
       - assets/images/gallery.png
       - assets/images/camera_picker.png
-      - assets/images/action_bar_header_yellow.png
-      - assets/images/add_more_request.png
+
       - assets/images/circle_grey.png
       - assets/images/line_horizontal_grey.png
       - assets/images/line_horizontal_selected.png
-      - assets/images/home_add_requesr.png
+
       - assets/images/add_package.png
       - assets/images/error_icon_red.png
       - assets/images/phone_black.png
       - assets/images/location_OPC.png
-      - assets/images/edit_green.png
-      - assets/images/publish_yellow.png
-      - assets/images/delete_red.png
+      - assets/images/cloud_img_orange.png
+
+      - assets/images/business.png
+      - assets/images/check.png
+      - assets/images/un_check.png
+      - assets/images/header_orange.png
+      - assets/images/sidepanel.png
+      - assets/images/pink_tick.png
+      - assets/images/blue_tick.png
+      - assets/images/yellow_tick.png
+      - assets/images/icon.png
+      - assets/images/down_arrow_icon.png
+      - assets/images/sorry_no_data.png
+      - assets/images/search_grey.png
+      - assets/images/location_null.png
+      - assets/images/location_RC.png
+      - assets/images/location_DPC.png
+      - assets/images/location_DA.png
+      - assets/images/location_OPC.png
+      - assets/images/up_expanded_arrow.png
+      - assets/images/down_expanded_arrow.png
+      - assets/images/dotted_orange_eclips.png
+      - assets/images/cancel_request.png
+      - assets/images/phone_orange.png
+      - assets/images/check_mark.png
+      - assets/images/like_orange.png
+      - assets/images/select_id_proof.png
+      - assets/images/select_product_img.png
+      - assets/images/select_package_img.png
+      - assets/images/unselected_white.png
+      - assets/images/selected_white.png
+      - assets/images/cancel_alert_img.png
+      - assets/images/call_img_green.png
+      - assets/images/up_down_arrow.png
+      - assets/images/orange_selected_check.png
+      - assets/images/unselected_check_op.png
+      - assets/images/user_name.png
+      - assets/images/edit_pencile.png
+      - assets/images/privacy_policy.png
+      - assets/images/sceret_code_icon.png
+      - assets/images/add_id_proof.png
+      - assets/images/loaction_grey.png
+      - assets/images/marker_icon.png
+      - assets/images/arrow_white_forward.png
+      - assets/images/right_semi_circle_yellow.png
+      - assets/images/right_semi_circle_grey.png
+      - assets/images/left_semi_circle_yellow_grey.png
+      - assets/images/left_semi_circle_yellow.png
+      - assets/images/left_semi_circle_grey.png
+      - assets/images/right_semi_circle_yellow_grey.png
+      - assets/images/scan_agent_code.png
+      - assets/images/calendar_icon.png
+      - assets/images/tooltip_icon.png
+
+      - assets/images/contact_us.png
+      - assets/images/help_get_direction.png
+      - assets/images/email_img.png
+      - assets/images/message_yellow_s.png
+
+
+      - assets/dashboard/baddress.png
+      - assets/dashboard/bdetail.png
+      - assets/dashboard/operation.png
+      - assets/dashboard/blue_arroe.png
+      - assets/dashboard/pink_arrow.png
+      - assets/dashboard/yellow_arrow.png
+
+      - assets/businessAddress/apartment.png
+      - assets/businessAddress/location.png
+      - assets/businessAddress/pincode.png
+      - assets/businessAddress/state.png
+      - assets/businessAddress/city.png
+      - assets/businessAddress/country.png
+
+      - assets/bankingDetail/abanumber.png
+      - assets/bankingDetail/account.png
+      - assets/bankingDetail/bank.png
+      - assets/bankingDetail/banklocation.png
+      - assets/bankingDetail/fullname.png
+
+
+      - assets/operation/uncheck_op.png
+      - assets/operation/Select.png
+      - assets/operation/unselect.png
 
 
       #- assets/images/name_icon_home.png

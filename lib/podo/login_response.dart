@@ -5,6 +5,7 @@ class LoginResponse {
   int expiresIn;
   String scope;
   String name;
+  String profileImageUrl;
   bool isRegistrationComplete;
   bool isActive;
   int userid;
@@ -15,6 +16,10 @@ class LoginResponse {
   String awsAccessKeyId;
   String awsSecretAccessKey;
 
+  bool isNewLogin;
+  String countryCode;
+  String mobile;
+
   LoginResponse(
       {this.accessToken,
         this.tokenType,
@@ -22,6 +27,7 @@ class LoginResponse {
         this.expiresIn,
         this.scope,
         this.name,
+        this.profileImageUrl,
         this.isRegistrationComplete,
         this.isActive,
         this.userid,
@@ -31,6 +37,9 @@ class LoginResponse {
         this.errorDescription,
         this.awsAccessKeyId,
         this.awsSecretAccessKey,
+        this.isNewLogin,
+        this.countryCode,
+        this.mobile,
       });
 
   LoginResponse.fromJson(Map<String, dynamic> json) {
@@ -40,6 +49,7 @@ class LoginResponse {
     expiresIn = json['expires_in'];
     scope = json['scope'];
     name = json['name'];
+    profileImageUrl = json['profileImageUrl'];
     isRegistrationComplete = json['isRegistrationComplete'];
     isActive = json['isActive'];
     userid = json['userid'];
@@ -49,6 +59,9 @@ class LoginResponse {
     errorDescription = json['error_description'];
     awsAccessKeyId = json['aws_access_key_id'];
     awsSecretAccessKey = json['aws_secret_access_key'];
+    isNewLogin = json['isNewLogin'];
+    countryCode = json['countryCode'];
+    mobile = json['mobile'];
   }
 
   Map<String, dynamic> toJson() {
@@ -68,6 +81,10 @@ class LoginResponse {
     data['error_description'] = this.errorDescription;
     data['aws_access_key_id'] = this.awsAccessKeyId;
     data['aws_secret_access_key'] = this.awsSecretAccessKey;
+
+    data['isNewLogin'] = this.isNewLogin;
+    data['countryCode'] = this.countryCode;
+    data['mobile'] = this.mobile;
     return data;
   }
 }

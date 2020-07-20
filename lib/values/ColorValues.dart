@@ -1,22 +1,26 @@
 import 'package:flutter/painting.dart';
 import 'package:flutter/material.dart';
 class ColorValues {
-  /*Deliva App colors*/
-    static const int primaryColor = 0XFFFEC32D;
+  /*deliva_pa App colors*/
+    static const int primaryColor = 0XFFFF782D;
   static const int yellow_light = 0XFFFEC92D;
   static const int white = 0XFFFFFFFF;
-  //static const int accentColor = 0XFF187897;
-  static const int accentColor = 0XFFFEC32D;
+  static const int accentColor = 0XFFFF782D;
+ // static const int accentColor = 0XFFFEC32D;
   static const int blueTheme = 0XFF187897;
   static const int yellowTheme = 0XFFFEC32D;
   static const int sea_blue = 0XFF2394BC;
+  static const int backgroundColorOp = 0XFFFFF9F5;
   static const int black = 0XFF000000;
   static const int black_light = 0XFF6C6C6C;
+  static const int black_light_new = 0XFF1B1E25;
   static const int sea_green_blue_light = 0XFF4C5669;
+  static const int notificationGreyTextColor = 0XFF929292;
   static const int text_view_hint = 0XFF8A8D8D;
   static const int text_view_theme = 0XFF8A8D8D;
   static const int text_green = 0XFF50BE0D;
   static const int text_red = 0XFFFF0606;
+  static const int text_complete_deatils = 0XFFFF5F44;
   static const int grey_light = 0XFF555555;
   static const int grey_hint_color = 0XFF949494;
   static const int grey_light_tab = 0XFFA9ADB5;
@@ -30,8 +34,25 @@ class ColorValues {
   static const int inTransitColorGreen = 0XFF2FB80C;
   static const int greyTextColorLight = 0XFF999999;
   static const int greyViewColor = 0XFFE6E9EB;
+    static const int orangeLight = 0XFFFF782D;
+    static const int warning_red = 0XFFEB2222;
+    static const int greyCardBorder = 0XFFEEEEEE;
 
+    static const int lightPinkColor = 0XFFFF8DBD;
+    static const int lightYellowColor = 0XFFFFC670;
+    static const int lightGreenColor = 0XFFB1FFA5;
+    static const int lightPurpleColor = 0XFFE7B3FF;
+    static const int lightBlueColor = 0XFF7CFFF7;
+    static const int lightOrangeColor = 0XFFFFA47C;
 
+    static const int notificationMonthTextColor = 0XFFB5B5B5;
+    static const int greyDividerColor = 0XFFBBBBBB;
+    static const int unreadTextColor = 0XFFA7A7A7;
+    static const int transactionTextColor = 0XFF2A2A2A;
+    static const int transactionLightTextColor = 0XFFA9A9A9;
+    static const int helpTextColor = 0XFF8A8D8D;
+    static const int ligthhelpTextColor = 0XFFB8B8B8;
+    static const int radioTextColor = 0XFFc4c4c4;
 
   static const int NAVIGATION_DRAWER_BG_COLOUR = 0XFFF7F7F9;
   static const int BOTTOAMBAR_ADD_BG_COLOUR= 0XFF3C79DB;

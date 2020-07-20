@@ -16,21 +16,24 @@ class ImagePickerUtility{
 
   static Future<File> getImageFromGallery() async {
     File _image=null;
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    //var image = await ImagePicker.pickImage(source: ImageSource.gallery,imageQuality: 50);
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery,maxHeight: 720);
     _image = image;
     print('_image:: $_image');
     return _image;
   }
   static Future<File> getImageFromCamera() async {
     File _image=null;
-    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    //var image = await ImagePicker.pickImage(source: ImageSource.camera,imageQuality: 50);
+    var image = await ImagePicker.pickImage(source: ImageSource.camera,maxHeight: 720);
     _image = image;
 
     return _image;
   }
   // This funcion will helps you to pick and Image from Gallery
   Future<File> pickImageFromGallery() async {
-    File image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    //File image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    File image = await ImagePicker.pickImage(source: ImageSource.gallery,maxHeight: 720);
     isImage = true;
     isDoc = false;
     return this.image = image;

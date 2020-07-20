@@ -15,14 +15,17 @@ class SharedPreferencesHelper {
   static final String NAME = "name";
   static final String IS_REGISTRATION_COMPLETE = "isRegistrationComplete";
   static final String IS_ACTIVE = "isActive";
+  static final String isNewLogin = "isNewLogin";
   static final String USER_ID = "userid";
   static final String IS_PROFILE_COMPLETE = "isProfileComplete";
   static final String JIT = "jti";
   static final String mobileNo = "mobileNo";
   static final String countryCode = "countryCode";
+  static final String loginType = "loginType";
 
   static final String _kLanguageCode = "language";
   static final String USER_EMAIL = "userEmail";
+  static final String USER_IMAGE_URL = "userImageUrl";
   static final String USER_PASSWORD = "userPassword";
   static final String IS_LOGGED_IN = "isLoggedin";
   static final String IS_LOGGED_OUT = "isLoggedOut";

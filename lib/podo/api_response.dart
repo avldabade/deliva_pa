@@ -52,18 +52,22 @@ class ResourceData {
   String mobileNo;
   int userId;
   String countryCode;
+  String docketNo;
 
   ResourceData(
       {this.isRegistrationComplete,
         this.mobileNo,
         this.userId,
-        this.countryCode});
+        this.countryCode,
+        this.docketNo
+      });
 
   ResourceData.fromJson(Map<String, dynamic> json) {
     isRegistrationComplete = json['isRegistrationComplete'];
     mobileNo = json['mobileNo'];
     userId = json['userId'];
     countryCode = json['countryCode'];
+    docketNo = json['docketNo'];
   }
 
   Map<String, dynamic> toJson() {
@@ -72,6 +76,7 @@ class ResourceData {
     data['mobileNo'] = this.mobileNo;
     data['userId'] = this.userId;
     data['countryCode'] = this.countryCode;
+    data['docketNo'] = this.docketNo;
     return data;
   }
 }

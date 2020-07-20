@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:deliva/constants/Constant.dart';
-import 'package:deliva/services/shared_preference_helper.dart';
-import 'package:deliva/services/utils.dart';
+import 'package:deliva_pa/constants/Constant.dart';
+import 'package:deliva_pa/services/shared_preference_helper.dart';
+import 'package:deliva_pa/services/utils.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/material.dart';

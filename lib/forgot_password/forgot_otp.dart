@@ -2,15 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:deliva/podo/api_response.dart';
-import 'package:deliva/podo/response_podo.dart';
-import 'package:deliva/podo/response_podo_s.dart';
-import 'package:deliva/registration/registration.dart';
-import 'package:deliva/forgot_password/reset_password.dart';
-import 'package:deliva/services/common_widgets.dart';
-import 'package:deliva/services/utils.dart';
-import 'package:deliva/values/ColorValues.dart';
-import 'package:deliva/values/StringValues.dart';
+import 'package:deliva_pa/podo/api_response.dart';
+import 'package:deliva_pa/podo/response_podo.dart';
+import 'package:deliva_pa/podo/response_podo_s.dart';
+import 'package:deliva_pa/registration/registration.dart';
+import 'package:deliva_pa/forgot_password/reset_password.dart';
+import 'package:deliva_pa/services/common_widgets.dart';
+import 'package:deliva_pa/services/utils.dart';
+import 'package:deliva_pa/values/ColorValues.dart';
+import 'package:deliva_pa/values/StringValues.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,6 +43,8 @@ class _ForgotOTPState extends State<ForgotOTP> {
 
   Timer _timer;
   int _start = Constants.OTP_TIMER;
+
+  String _OTPErrorMsg=StringValues.blankOTP;
 
   @override
   void dispose() {
@@ -108,46 +110,8 @@ class _ForgotOTPState extends State<ForgotOTP> {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  Container(
-                    height: 60.0,
-                    //margin: EdgeInsets.only(top: 24.0),
-                    child: Card(
-                      margin: EdgeInsets.all(0.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        mainAxisSize: MainAxisSize.max,
-                        children: <Widget>[
-                          IconButton(
-                            icon: new Icon(
-                              Icons.arrow_back_ios,
-                              color: Color(ColorValues.black),
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                          Center(
-                            child: Text(
-                              StringValues.TEXT_ENTER_OTP,
-                              style: TextStyle(
-                                  color: Color(ColorValues.black),
-                                  fontSize: 20.0,
-                                  fontFamily: StringValues.customSemiBold),
-                            ),
-                          ),
-                          IconButton(
-                            icon: new Icon(
-                              Icons.arrow_back_ios,
-                              color: Colors.transparent,
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+
+                  Utils().commonAppBar(StringValues.TEXT_ENTER_OTP,context),
                   Expanded(
                     child: ListView(
                       children: <Widget>[
@@ -178,8 +142,10 @@ class _ForgotOTPState extends State<ForgotOTP> {
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top:40.0,bottom: 30.0),
-                                  child: Text('$_start ${StringValues.sec}',
+                                  child: _start != 0 ? Text('$_start ${StringValues.sec}',
                                     style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 20.0,fontWeight: FontWeight.w600),
+                                  ):Text('${StringValues.otp_expire_msg_mobile}',
+                                    style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 14.0,fontWeight: FontWeight.w600),
                                   ),
                                 ),
 
@@ -218,9 +184,19 @@ class _ForgotOTPState extends State<ForgotOTP> {
                                   pinTextAnimatedSwitcherDuration:
                                   Duration(milliseconds: 300),
                                 ),
+                               /* Visibility(
+                                  child:controller.text==""?Text(
+                                    "Enter OTP",
+                                    style: TextStyle(color: Colors.red),
+                                  ): Text(
+                                    StringValues.wrongOTP,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                  visible: hasError,
+                                ),*/
                                 Visibility(
                                   child: Text(
-                                    StringValues.wrongOTP,
+                                    '$_OTPErrorMsg',
                                     style: TextStyle(color: Colors.red),
                                   ),
                                   visible: hasError,
@@ -232,6 +208,7 @@ class _ForgotOTPState extends State<ForgotOTP> {
                                 GestureDetector(
                                   onTap: () {
                                     if(_start == 0){
+                                      controller.clear();
                                       callGetGenerateOtpApi();
                                     }
                                   },
@@ -253,11 +230,11 @@ class _ForgotOTPState extends State<ForgotOTP> {
                                     shape: new RoundedRectangleBorder(
                                         borderRadius: new BorderRadius.circular(30.0),
                                         side: BorderSide(
-                                            color: Color(ColorValues.yellow_light))),
+                                            color: _start != 0 ?Color(ColorValues.accentColor):Color(ColorValues.grey_hint_color))),
                                     onPressed: () {
-                                      validateOtp();
+                                      _start != 0 ? validateOtp():"";
                                     },
-                                    color: Color(ColorValues.yellow_light),
+                                    color: _start != 0 ?Color(ColorValues.accentColor):Color(ColorValues.grey_hint_color),
                                     textColor: Colors.white,
                                     child: Padding(
                                       padding: const EdgeInsets.all(10.0),
@@ -467,7 +444,7 @@ class _ForgotOTPState extends State<ForgotOTP> {
     }
   }
 
-  void _validateInputs() {
+ /* void _validateInputs() {
     this.otpText = controller.text;
     if (otpText.length < 4 ||
         otpText.isEmpty ||
@@ -477,6 +454,27 @@ class _ForgotOTPState extends State<ForgotOTP> {
       });
       _isSubmitPressed = false;
     } else {
+      print("OPT is correct...");
+      callVerifyOtpApi();
+    }
+  }*/
+
+  void _validateInputs() {
+    this.otpText = controller.text;
+    if (otpText.isEmpty){
+      setState(() {
+        this.hasError = true;
+        _OTPErrorMsg = StringValues.blankOTP;
+      });
+      _isSubmitPressed = false;
+    }
+    else if (otpText.length < 4 || otpText.compareTo("1234") != 0) {
+      setState(() {
+        this.hasError = true;
+        _OTPErrorMsg = StringValues.wrongOTP;
+      });
+      _isSubmitPressed = false;
+    }  else {
       print("OPT is correct...");
       callVerifyOtpApi();
     }

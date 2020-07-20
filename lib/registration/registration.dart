@@ -2,20 +2,18 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:country_code_picker/country_code_picker.dart';
-import 'package:deliva/constants/Constant.dart';
-import 'package:deliva/forgot_password/forgot_password.dart';
-import 'package:deliva/login/login.dart';
-import 'package:deliva/login/login_options.dart';
-import 'package:deliva/login/login_with_mobile.dart';
-import 'package:deliva/registration/my_profile.dart';
-import 'package:deliva/podo/api_response.dart';
-import 'package:deliva/registration/registration_otp.dart';
-import 'package:deliva/services/common_widgets.dart';
-import 'package:deliva/services/shared_preference_helper.dart';
-import 'package:deliva/services/utils.dart';
-import 'package:deliva/services/validation_textfield.dart';
-import 'package:deliva/values/ColorValues.dart';
-import 'package:deliva/values/StringValues.dart';
+import 'package:deliva_pa/constants/Constant.dart';
+import 'package:deliva_pa/login/login_options.dart';
+import 'package:deliva_pa/login/login_with_mobile.dart';
+import 'package:deliva_pa/podo/api_response.dart';
+import 'package:deliva_pa/registration/registration_otp.dart';
+import 'package:deliva_pa/services/common_widgets.dart';
+import 'package:deliva_pa/services/input_formatters.dart';
+import 'package:deliva_pa/services/utils.dart';
+import 'package:deliva_pa/services/validation_textfield.dart';
+import 'package:deliva_pa/values/ColorValues.dart';
+import 'package:deliva_pa/values/StringValues.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -53,7 +51,9 @@ class _RegistrationState extends State<Registration> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
 
-  bool hasError=false;
+  bool hasError = false;
+
+  String _mobileError='';
 
   @override
   void initState() {
@@ -176,7 +176,7 @@ class _RegistrationState extends State<Registration> {
                                       ),
                                       child: Form(
                                         key: _formKey,
-                                        autovalidate: _autoValidate,
+                                        //autovalidate: _autoValidate,
                                         child: SingleChildScrollView(
                                           child: Container(
                                             width: MediaQuery.of(context)
@@ -215,56 +215,70 @@ class _RegistrationState extends State<Registration> {
                                                         fontSize: 17.0),
                                                   ),
                                                   Row(
-                                                    mainAxisAlignment:MainAxisAlignment.start,
-                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     children: <Widget>[
-                                                      CountryCodePicker(
-                                                        onChanged:
-                                                            _onCountryChange,
-                                                        // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
-                                                        initialSelection:
-                                                            '+$_countryCode',
-                                                        favorite: [
-                                                          'IN',
-                                                          '+39',
-                                                          'FR'
-                                                        ],
-                                                        // optional. Shows only country name and flag
-                                                        showCountryOnly: false,
-                                                        // optional. Shows only country name and flag when popup is closed.
-                                                        showOnlyCountryWhenClosed:
-                                                            false,
-                                                        // optional. aligns the flag and the Text left
-                                                        alignLeft: false,
-                                                        showFlag: false,
-                                                        showFlagDialog: false,
+                                                      SizedBox(
+                                                        width: 40.0,
+                                                        child: CountryCodePicker(
+                                                          onChanged:
+                                                              _onCountryChange,
+                                                          // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
+                                                          initialSelection:
+                                                              '+$_countryCode',
+                                                          favorite: [
+                                                            'IN',
+                                                            '+39',
+                                                            'FR'
+                                                          ],
+                                                          // optional. Shows only country name and flag
+                                                          showCountryOnly: false,
+                                                          // optional. Shows only country name and flag when popup is closed.
+                                                          showOnlyCountryWhenClosed:
+                                                              false,
+                                                          // optional. aligns the flag and the Text left
+                                                          alignLeft: false,
+                                                          showFlag: false,
+                                                          //showFlagDialog: false,
 
-                                                        padding:
-                                                            EdgeInsets.all(0),
-                                                        flagWidth: 25.0,
-                                                        onInit: (code) {
-                                                          print(
-                                                              "on init ${code.name} ${code.dialCode}");
-                                                          var codeA = code
-                                                              .dialCode
-                                                              .split("+");
-                                                          print(
-                                                              "Country on init: " +
-                                                                  codeA[1]);
-                                                          _countryCode =
-                                                              codeA[1];
-                                                        },
+                                                          padding:
+                                                              EdgeInsets.all(0),
+                                                          //flagWidth: 25.0,
+                                                          onInit: (code) {
+                                                            print(
+                                                                "on init ${code.name} ${code.dialCode}");
+                                                            var codeA = code
+                                                                .dialCode
+                                                                .split("+");
+                                                            print(
+                                                                "Country on init: " +
+                                                                    codeA[1]);
+                                                            _countryCode =
+                                                                codeA[1];
+                                                          },
+                                                        ),
+                                                      ),
+                                                      Image(
+                                                        image: new AssetImage(
+                                                            'assets/images/down_arrow_icon.png'),
+                                                        width: 10.0,
+                                                        height: 12.0,
+                                                        //fit: BoxFit.fitHeight,
                                                       ),
                                                       Container(
-                                                        height: 30.0,
-                                                        width: 1.0,
+                                                        margin: EdgeInsets.only(left: 5.0),
+                                                        height: 20.0,
+                                                        width: 0.5,
                                                         color: Color(ColorValues
                                                             .grey_light_divider),
                                                       ),
                                                       Padding(
                                                           padding:
-                                                              EdgeInsets.only(
-                                                                  left: 5.0)),
+                                                          EdgeInsets.only(
+                                                              left: 8.0)),
                                                       Image(
                                                         image: new AssetImage(
                                                             'assets/images/phone_icon.png'),
@@ -284,12 +298,11 @@ class _RegistrationState extends State<Registration> {
                                                           keyboardType:
                                                               TextInputType
                                                                   .phone,
-                                                          maxLength: 13,
+                                                          //maxLength: 11,
                                                           inputFormatters: [
-                                                            WhitelistingTextInputFormatter
-                                                                .digitsOnly,
-                                                            // Fit the validating format.
-                                                            //_phoneNumberFormatter,
+                                                            WhitelistingTextInputFormatter.digitsOnly,
+                                                            new LengthLimitingTextInputFormatter(11),
+                                                            new MobileNumberInputFormatter(),
                                                           ],
                                                           //to block space character
                                                           textInputAction:
@@ -317,24 +330,37 @@ class _RegistrationState extends State<Registration> {
                                                                 .unfocus();
                                                             _validate();
                                                           },
-                                                          validator: (String arg) {
-                                                            String val=Validation.validateMobile(arg);
+                                                          validator:
+                                                              (String arg) {
+                                                            String val = Validation
+                                                                .validateMobile(
+                                                                    arg);
                                                             //setState(() {
-                                                            if(val != null)
-                                                              hasError=true;
+                                                            _mobileError = val;
+                                                            if (val != null)
+                                                              hasError = true;
                                                             else
-                                                              hasError=false;
+                                                              hasError = false;
                                                             //});
                                                             return val;
                                                           },
                                                           onSaved: (value) {
                                                             _mobileNo = value;
                                                           },
-                                                          onChanged: (val){
-                                                            if(val.length > 9)
-                                                              hasError=false;
-                                                            else
-                                                              hasError=true;
+                                                          onChanged: (arg) {
+                                                              String val = Validation
+                                                                  .validateMobile(
+                                                                  arg);
+                                                              //setState(() {
+                                                              _mobileError = val;
+                                                              if (val != null)
+                                                                hasError = true;
+                                                              else
+                                                                hasError = false;
+                                                              //});
+                                                            setState(() {
+
+                                                            });
                                                           },
                                                         ),
                                                       ),
@@ -344,40 +370,61 @@ class _RegistrationState extends State<Registration> {
                                                     children: <Widget>[
                                                       Padding(
                                                         padding:
-                                                        const EdgeInsets.only(bottom: 10.0),
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                bottom: 10.0),
                                                         child: new Container(
                                                           height: 1.0,
-                                                          color: hasError?Color(ColorValues.error_red) :Colors.grey,
+                                                          color: hasError && _autoValidate
+                                                              ? Color(ColorValues
+                                                                  .error_red)
+                                                              : Colors.grey,
                                                         ),
                                                       ),
                                                       Visibility(
                                                         child: Align(
-                                                          alignment: Alignment.centerLeft,
+                                                          alignment: Alignment
+                                                              .centerLeft,
                                                           child: Padding(
-                                                            padding: const EdgeInsets.only(top:5.0),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    top: 5.0),
                                                             child: Text(
-                                                              StringValues.ENTER_VALID_MOBILE_NO,
-                                                              style: TextStyle(color: Color(ColorValues.error_red),fontSize: 12.0),
+                                                              '$_mobileError',
+                                                              style: TextStyle(
+                                                                  color: Color(
+                                                                      ColorValues
+                                                                          .error_red),
+                                                                  fontSize:
+                                                                      12.0),
                                                             ),
                                                           ),
                                                         ),
-                                                        visible: hasError,
+                                                        visible: hasError && _autoValidate,
                                                       ),
-                                                      hasError ? Positioned(
-                                                        right: 0.0,
-                                                        bottom: 0.0,
-                                                        //alignment: Alignment.bottomRight,
-                                                        child: Image(
-                                                          image: new AssetImage(
-                                                              'assets/images/error_icon_red.png'),
-                                                          width: 16.0,
-                                                          height: 16.0,
-                                                          //fit: BoxFit.fitHeight,
-                                                        ),
-                                                      ):Container(),
+                                                      hasError && _autoValidate
+                                                          ? Positioned(
+                                                              right: 0.0,
+                                                              bottom: 0.0,
+                                                              top:1.0,
+                                                              //alignment: Alignment.bottomRight,
+                                                              child: Image(
+                                                                image: new AssetImage(
+                                                                    'assets/images/error_icon_red.png'),
+                                                                width: 17.0,
+                                                                height: 17.0,
+                                                                //fit: BoxFit.fitHeight,
+                                                              ),
+                                                            )
+                                                          : Container(),
                                                     ],
                                                   ),
-                                                  hasError ? Container(height: 10.0,) : Container(),
+                                                  hasError && _autoValidate
+                                                      ? Container(
+                                                          height: 10.0,
+                                                        )
+                                                      : Container(),
                                                   Row(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment.start,
@@ -469,12 +516,12 @@ class _RegistrationState extends State<Registration> {
                                                             side: BorderSide(
                                                                 color: Color(
                                                                     ColorValues
-                                                                        .yellow_light))),
+                                                                        .accentColor))),
                                                         onPressed: () {
                                                           _validate();
                                                         },
                                                         color: Color(ColorValues
-                                                            .yellow_light),
+                                                            .accentColor),
                                                         textColor: Colors.white,
                                                         child: Padding(
                                                           padding:
@@ -710,6 +757,7 @@ class _RegistrationState extends State<Registration> {
     setState(() {
       _isInProgress = true;
     });
+    _mobileNo=Utils().getActualMobileNo(mobileNoController.text);
     Map<String, dynamic> requestJson = {
       "countryCode": _countryCode,
       "mobileNo": _mobileNo,
@@ -738,10 +786,11 @@ class _RegistrationState extends State<Registration> {
       print('jsonResponse::::: ${jsonResponseMap.toString()}');
       //ResponsePodo responsePodo = new ResponsePodo.fromJson(jsonResponseMap);
       APIResponse apiResponse = new APIResponse.fromJson(jsonResponseMap);
-      print("apiResponse.responseMessage:: ${apiResponse.responseMessage}");
+
 
       if (response.statusCode == 200) {
         print("statusCode 200....");
+        print("apiResponse.responseMessage:: ${apiResponse.responseMessage}");
         if (apiResponse.status == 200) {
           print("apiResponse.resourceData:: ${apiResponse.resourceData}");
           ResourceData resourceData = apiResponse.resourceData;
@@ -753,7 +802,7 @@ class _RegistrationState extends State<Registration> {
               "false") {
             //_navigateToMyProfile(apiResponse.resourceData.userId);
             _navigateToLoginMobile();
-            Toast.show("User is already exist, Please login complete profile.",
+            Toast.show(apiResponse.message,
                 context,
                 duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
           }
@@ -779,7 +828,7 @@ class _RegistrationState extends State<Registration> {
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         //_navigateToLogin();
       } else {
-        Toast.show("Error Code is:: ${response.statusCode}", context,
+        Toast.show(apiResponse.message, context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       }
     } on SocketException catch (e) {
@@ -800,7 +849,7 @@ class _RegistrationState extends State<Registration> {
     }
   }
 
- /* void _validateInputs() {
+  /* void _validateInputs() {
     if (_formKey.currentState.validate()) {
 //    If all data are correct then save data to out variables
       _formKey.currentState.save();
@@ -824,17 +873,25 @@ class _RegistrationState extends State<Registration> {
     }
   }*/
   void _validateInputs() {
-    if (Validation.validateMobile(
-        mobileNoController.text) ==
-        null) {
+    _autoValidate=true;
+    String msg = Validation.validateMobile(mobileNoController.text);
+    if (msg == null) {
       setState(() {
         this.hasError = false;
       });
-      callGetOtpApi();
+      if (_checkedValue) {
+        callGetOtpApi();
+      } else {
+        Toast.show(StringValues.TEXT_PLEASE_ACCEPT, context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        _isSubmitPressed = false;
+      }
     } else {
       setState(() {
+        _mobileError=msg;
         this.hasError = true;
       });
+
       _isSubmitPressed = false;
     }
   }

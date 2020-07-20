@@ -1,18 +1,18 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:deliva/forgot_password/forgot_password.dart';
-import 'package:deliva/login/login_with_email.dart';
-import 'package:deliva/login/login_with_mobile.dart';
-import 'package:deliva/podo/login_response.dart';
-import 'package:deliva/podo/response_podo.dart';
-import 'package:deliva/registration/registration.dart';
-import 'package:deliva/services/common_widgets.dart';
-import 'package:deliva/services/shared_preference_helper.dart';
-import 'package:deliva/services/utils.dart';
-import 'package:deliva/services/validation_textfield.dart';
-import 'package:deliva/values/ColorValues.dart';
-import 'package:deliva/values/StringValues.dart';
+import 'package:deliva_pa/forgot_password/forgot_password.dart';
+import 'package:deliva_pa/login/login_with_email.dart';
+import 'package:deliva_pa/login/login_with_mobile.dart';
+import 'package:deliva_pa/podo/login_response.dart';
+import 'package:deliva_pa/podo/response_podo.dart';
+import 'package:deliva_pa/registration/registration.dart';
+import 'package:deliva_pa/services/common_widgets.dart';
+import 'package:deliva_pa/services/shared_preference_helper.dart';
+import 'package:deliva_pa/services/utils.dart';
+import 'package:deliva_pa/services/validation_textfield.dart';
+import 'package:deliva_pa/values/ColorValues.dart';
+import 'package:deliva_pa/values/StringValues.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:toast/toast.dart';
@@ -157,7 +157,7 @@ class _LoginOptionsState extends State<LoginOptions> {
                                                 Container(height: 20.0,),
                                                 Image(
                                                   image: new AssetImage(
-                                                      'assets/images/cloud_img.png'),
+                                                      'assets/images/cloud_img_orange.png'),
                                                   width: 110.0,
                                                   height: 110.0,
                                                 ),
@@ -167,7 +167,7 @@ class _LoginOptionsState extends State<LoginOptions> {
                                                           top: 8.0,
                                                           bottom: 16.0),
                                                   child: Text(
-                                                    StringValues.welcomeDeliva,
+                                                    StringValues.welcomedeliva_pa,
                                                     style: TextStyle(
                                                         color: Color(
                                                             ColorValues
@@ -181,14 +181,63 @@ class _LoginOptionsState extends State<LoginOptions> {
                                                       const EdgeInsets.only(
                                                           bottom: 25.0),
                                                 ),
+                                                Padding(
+                                                  padding:
+                                                  const EdgeInsets.only(
+                                                      bottom: 25.0),
+                                                ),
                                                 GestureDetector(
                                                   onTap: _navigateToLoginWithEmail,
-                                                  child: Image(
-                                                    image: new AssetImage(
-                                                        'assets/images/login_with_email.png'),
-                                                    //width: 145.0,
-                                                    height: 40.0,
-                                                    fit: BoxFit.cover,
+                                                  child: Container(
+                                                    //width: 130.0,
+                                                    height: 45.0,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                      new BorderRadius.all(
+                                                        Radius.circular(30.0),
+                                                      ),
+                                                      //color: Color(ColorValues.primaryColor),
+                                                      //Color(ColorValues.primaryColor),
+                                                      shape: BoxShape.rectangle,
+                                                      border: Border.all(
+                                                        color: Color(ColorValues
+                                                            .accentColor),
+                                                        width: 0.5,
+                                                        style: BorderStyle.solid,
+                                                      ),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 8.0),
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: <Widget>[
+                                                          Image(
+                                                            image: new AssetImage(
+                                                                'assets/images/email_icon.png'),
+                                                            width: 22.0,
+                                                            height: 22.0,
+                                                            //fit: BoxFit.fitHeight,
+                                                          ),
+                                                          Container(width: 8.0,),
+                                                          Padding(
+                                                            padding: const EdgeInsets.all(8.0),
+                                                            child: Text(
+                                                              StringValues.emailLogin,
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                FontWeight.w600,
+                                                                color: Color(ColorValues
+                                                                    .black),
+                                                              ),
+                                                              maxLines: 1,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                                 Padding(
@@ -198,12 +247,56 @@ class _LoginOptionsState extends State<LoginOptions> {
                                                 ),
                                                 GestureDetector(
                                                   onTap: _navigateToLoginWithMobile,
-                                                  child: Image(
-                                                    image: new AssetImage(
-                                                        'assets/images/login_with_mobile.png'),
-                                                    //width: 145.0,
-                                                    height: 40.0,
-                                                    fit: BoxFit.cover,
+                                                  child: Container(
+                                                    //width: 130.0,
+                                                    height: 45.0,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                      new BorderRadius.all(
+                                                        Radius.circular(30.0),
+                                                      ),
+                                                      //color: Color(ColorValues.primaryColor),
+                                                      //Color(ColorValues.primaryColor),
+                                                      shape: BoxShape.rectangle,
+                                                      border: Border.all(
+                                                        color: Color(ColorValues
+                                                            .accentColor),
+                                                        width: 0.5,
+                                                        style: BorderStyle.solid,
+                                                      ),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 8.0),
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: <Widget>[
+                                                          Image(
+                                                            image: new AssetImage(
+                                                                'assets/images/phone_icon.png'),
+                                                            width: 22.0,
+                                                            height: 22.0,
+                                                            //fit: BoxFit.fitHeight,
+                                                          ),
+                                                          Container(width: 8.0,),
+                                                          Padding(
+                                                            padding: const EdgeInsets.all(8.0),
+                                                            child: Text(
+                                                              StringValues.mobileLogin,
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                FontWeight.w600,
+                                                                color: Color(ColorValues
+                                                                    .black),
+                                                              ),
+                                                              maxLines: 1,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                                 /*GestureDetector(
@@ -227,7 +320,7 @@ class _LoginOptionsState extends State<LoginOptions> {
                                                       shape: BoxShape.rectangle,
                                                       border: Border.all(
                                                         color: Color(ColorValues
-                                                            .yellow_light),
+                                                            .accentColor),
                                                         width: 1,
                                                         style: BorderStyle.solid,
                                                       ),
@@ -254,27 +347,7 @@ class _LoginOptionsState extends State<LoginOptions> {
                                                   const EdgeInsets.only(
                                                       bottom: 25.0),
                                                 ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceAround,
-                                                  children: <Widget>[
-                                                    Image(
-                                                      image: new AssetImage(
-                                                          'assets/images/facebook_btn_elips.png'),
-                                                      //width: 145.0,
-                                                      height: 40.0,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                    Image(
-                                                      image: new AssetImage(
-                                                          'assets/images/google_btn_eclips.png'),
-                                                      //width: 145.0,
-                                                      height: 40.0,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ],
-                                                ),
+
                                                 Padding(
                                                   padding:
                                                   const EdgeInsets.only(

@@ -1,22 +1,25 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:deliva/home_screen/dashboard.dart';
-import 'package:deliva/login/login_options.dart';
-import 'package:deliva/podo/login_response.dart';
-import 'package:deliva/services/number_text_input_formator.dart';
-import 'package:deliva/podo/api_response.dart';
-import 'package:deliva/registration/registration.dart';
-import 'package:deliva/services/common_widgets.dart';
-import 'package:deliva/services/shared_preference_helper.dart';
-import 'package:deliva/services/utils.dart';
-import 'package:deliva/services/validation_textfield.dart';
-import 'package:deliva/values/ColorValues.dart';
-import 'package:deliva/values/StringValues.dart';
+import 'package:deliva_pa/customize_predefine_widgets/custom_alert_dialogs.dart';
+import 'package:deliva_pa/podo/login_response.dart';
+import 'package:deliva_pa/podo/response_podo.dart';
+import 'package:deliva_pa/services/number_text_input_formator.dart';
+import 'package:deliva_pa/podo/api_response.dart';
+import 'package:deliva_pa/registration/registration.dart';
+import 'package:deliva_pa/services/common_widgets.dart';
+import 'package:deliva_pa/services/shared_preference_helper.dart';
+import 'package:deliva_pa/services/utils.dart';
+import 'package:deliva_pa/services/validation_textfield.dart';
+import 'package:deliva_pa/values/ColorValues.dart';
+import 'package:deliva_pa/values/StringValues.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoder/geocoder.dart';
+import 'package:geocoder/model.dart';
 import 'package:http/http.dart' as http;
+import 'package:location/location.dart';
 
 import '../constants/Constant.dart';
 import 'package:toast/toast.dart';
@@ -36,35 +39,36 @@ class MyProfile extends StatefulWidget {
 
 class _MyProfileState extends State<MyProfile> {
   //} with SingleTickerProviderStateMixin {
-  final passwordController = TextEditingController();
 
-  //final confirmPasswordController = TextEditingController();
 
-  //final FocusNode _confirmPasswordFocus = FocusNode();
-  final FocusNode _passwordFocus = FocusNode();
-
-  String _password;
-
-  //String _confirmPassword;
-
+  var latitude,longitude;
   bool _obscureText = true;
   bool _obscureTextCon = true;
 
-  final mobileNoController = TextEditingController();
-  final FocusNode _mobileNoFocus = FocusNode();
-  String _mobileNo;
+  bool passError=false;
+  final passwordController = TextEditingController();
+  final FocusNode _passwordFocus = FocusNode();
+  String _password;
 
-  final fullNameController = TextEditingController();
-  final FocusNode _fullNameFocus = FocusNode();
-  String _fullName;
+  bool bCompanyError=false;
+  final businessNameController = TextEditingController();
+  final FocusNode _businessNameFocus = FocusNode();
+  String _businessName;
 
+  bool bTypeError=false;
+  final businessTypeController = TextEditingController();
+  final FocusNode _businessTypeFocus = FocusNode();
+  String _businessType;
+
+  bool emailError=false;
   final emailController = TextEditingController();
   final FocusNode _emailFocus = FocusNode();
   String _email;
 
-  final addressController = TextEditingController();
-  final FocusNode _addressFocus = FocusNode();
-  String _address;
+  bool bRegNumError=false;
+  final businessRegistrationNumController = TextEditingController();
+  final FocusNode _brnumFocus = FocusNode();
+  String _brnumber;
 
   NumberTextInputFormatter _phoneNumberFormatter = NumberTextInputFormatter(1);
 
@@ -76,11 +80,7 @@ class _MyProfileState extends State<MyProfile> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
 
-  bool isPasswordError = false;
-
-  bool isNameError = false;
-  bool isEmailError = false;
-  bool isAddressError = false;
+  bool _checkedValue = false;
 
   /*AnimationController _animationController;
   Animation _animation;*/
@@ -90,8 +90,8 @@ class _MyProfileState extends State<MyProfile> {
     // TODO: implement initState
 
     super.initState();
-    mobileNoController.text = "+${widget.countryCode} ${widget.mobileNo}";
 
+    getUserLocationNew();
     /*  _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 300));
     _animation = Tween(begin: 300.0, end: 50.0).animate(_animationController)
       ..addListener(() {
@@ -112,14 +112,14 @@ class _MyProfileState extends State<MyProfile> {
     // TODO: implement dispose
     passwordController.dispose();
     _passwordFocus.dispose();
-    mobileNoController.dispose();
-    _mobileNoFocus.dispose();
-    fullNameController.dispose();
-    _fullNameFocus.dispose();
+    businessNameController.dispose();
+    _businessNameFocus.dispose();
+    businessTypeController.dispose();
+    _businessTypeFocus.dispose();
     emailController.dispose();
     _emailFocus.dispose();
-    addressController.dispose();
-    _addressFocus.dispose();
+    businessRegistrationNumController.dispose();
+    _brnumFocus.dispose();
     super.dispose();
   }
 
@@ -129,7 +129,11 @@ class _MyProfileState extends State<MyProfile> {
       statusBarColor: Color(ColorValues.white),
       statusBarIconBrightness: Brightness.dark, //top bar icons
     ));
-
+    void _toggle() {
+      setState(() {
+        _obscureText = !_obscureText;
+      });
+    }
     return Material(
       //resizeToAvoidBottomPadding: false,
       /*appBar: AppBar(
@@ -160,212 +164,647 @@ class _MyProfileState extends State<MyProfile> {
         ),
         centerTitle: true,
       ),*/
-      child: Scaffold(
-        resizeToAvoidBottomPadding: false,
-        resizeToAvoidBottomInset: false,
-        body: SafeArea(
-          child: Stack(
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  Container(
-                    height: 60.0,
-                    //margin: EdgeInsets.only(top: 24.0),
-                    child: Card(
-                      margin: EdgeInsets.all(0.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        mainAxisSize: MainAxisSize.max,
-                        children: <Widget>[
-                          IconButton(
-                            icon: new Icon(
-                              Icons.arrow_back_ios,
-                              color: Color(ColorValues.black),
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
+      child:  WillPopScope(
+        onWillPop: _onBackPressed,
+        child: Scaffold(
+          resizeToAvoidBottomPadding: false,
+          resizeToAvoidBottomInset: false,
+          body: SafeArea(
+            child: Stack(
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Container(
+                      height: 60.0,
+                      //margin: EdgeInsets.only(top: 24.0),
+                      child: Card(
+                        margin: EdgeInsets.all(0.0),
+                        //elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(0.0),
                           ),
-                          Center(
-                            child: Text(
-                              StringValues.TEXT_MY_PROFILE,
-                              style: TextStyle(
-                                  color: Color(ColorValues.black),
-                                  fontSize: 20.0,
-                                  fontFamily: StringValues.customSemiBold),
-                            ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+
+                            widget.from != 'Dashboard'
+                                ? Padding(
+                        padding: const EdgeInsets.only(top:4.0,left: 16.0),
+                        child: GestureDetector(
+                          onTap: (){
+                            confirmBack();
+                          },
+                          child: Image(
+                            image: new AssetImage(
+                                'assets/images/left_black_arrow.png'),
+                            width: 20.0,
+                            height: 24.0,
+                            //fit: BoxFit.fitHeight,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 16.0),
-                            child: Image(
-                              image: new AssetImage('assets/images/step_2.png'),
-                              width: 50.0,
-                              height: 40.0,
-                              //fit: BoxFit.cover,
+                        ),
+                      ):
+                            IconButton(
+                              icon: new Icon(
+                                Icons.arrow_back_ios,
+                                color: Colors.transparent,
+                              ),
+
                             ),
-                          ),
-                          /*IconButton(
-                      icon: new Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.transparent,
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),*/
-                        ],
+                            Center(
+                              child: Text(
+                                StringValues.TEXT_MY_PROFILE,
+                                style: TextStyle(
+                                    color: Color(ColorValues.black),
+                                    fontSize: 20.0,
+                                    fontFamily: StringValues.customSemiBold),
+                              ),
+                            ),
+                            Padding(
+                                padding: const EdgeInsets.only(right: 16.0),
+                                child: Container(width: 20.0,)
+                            ),
+                            /*IconButton(
+                        icon: new Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.transparent,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),*/
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  //Container(height: 16.0,),
-                  Expanded(
-                    //color: Colors.red,
-                    child: ListView(
-                      //scrollDirection: ,
-                      children: <Widget>[
-                        Form(
-                          key: _formKey,
-                          autovalidate: _autoValidate,
-                          child: Container(
-                            margin: const EdgeInsets.only(
-                                left: 24.0, right: 24.0, bottom: 24.0),
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                  bottom:
-                                      MediaQuery.of(context).viewInsets.bottom),
-                              child: Column(
-                                children: <Widget>[
-                                  Image(
-                                    image: new AssetImage(
-                                        'assets/images/profile_img_girl.png'),
-                                    width: 175.0,
-                                    height: 124.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 10.0, bottom: 24.0),
-                                    child: Text(
-                                      StringValues.TEXT_PLZ_COMPLETE,
-                                      style: TextStyle(
-                                        color:
-                                            Color(ColorValues.text_view_theme),
-                                        fontSize: 18.0,
-                                        fontFamily: StringValues.customLight,
-                                      ),
+                    Expanded(
+                      //color: Colors.red,
+                      child: ListView(
+                        //scrollDirection: ,
+                        children: <Widget>[
+                          Form(
+                            key: _formKey,
+                            autovalidate: _autoValidate,
+                            child: Container(
+                              margin: const EdgeInsets.only(
+                                  left: 24.0, right: 24.0, bottom: 24.0),
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                    bottom:
+                                    MediaQuery.of(context).viewInsets.bottom),
+                                child: Column(
+                                  children: <Widget>[
+
+                                    Image(
+                                      image: new AssetImage(
+                                          'assets/images/profile_img_girl.png'),
+                                      width: 175.0,
+                                      height: 124.0,
+                                      fit: BoxFit.cover,
                                     ),
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 16.0),
-                                        child: Image(
-                                          image: new AssetImage(
-                                              'assets/images/phone_black.png'),
-                                          width: 16.0,
-                                          height: 16.0,
-                                          //fit: BoxFit.fitHeight,
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 10.0, bottom: 24.0),
+                                      child: Text(
+                                        StringValues.TEXT_PLZ_COMPLETE,
+                                        style: TextStyle(
+                                          color: Color(ColorValues.text_view_hint),
+                                          fontSize: 18.0,
+                                          fontFamily: StringValues.customLight,
                                         ),
                                       ),
-                                      Container(
-                                        width: 12.0,
-                                      ),
-                                      Expanded(
-                                        child: TextFormField(
-                                          controller: mobileNoController,
-                                          focusNode: _mobileNoFocus,
-                                          keyboardType: TextInputType.phone,
-                                          maxLength: 13,
-                                          enabled: false,
-                                          inputFormatters: [
-                                            WhitelistingTextInputFormatter
-                                                .digitsOnly,
-                                            // Fit the validating format.
-                                            //_phoneNumberFormatter,
-                                          ],
-                                          //to block space character
-                                          textInputAction: TextInputAction.next,
+                                    ),
+                                    Stack(
+                                      children: <Widget>[
+                                        /*Positioned(
+                                          top:0,
+                                          left: 0,
+                                          child: Text(StringValues.TEXT_EMAIL,style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 17.0),),),*/
+                                        bCompanyError && _autoValidate
+                                            ? Positioned(
+                                          right: 0.0,
+                                          bottom: 2.0,
+                                          //alignment: Alignment.bottomRight,
+                                          child: Image(
+                                            image: new AssetImage(
+                                                'assets/images/error_icon_red.png'),
+                                            width: 17.0,
+                                            height: 17.0,
+                                            //fit: BoxFit.fitHeight,
+                                          ),
+                                        )
+                                            : Container(),
+                                        Theme(
+                                          data: Theme.of(context).copyWith(
+                                            primaryColor: Color(
+                                                ColorValues.text_view_theme),
+                                            inputDecorationTheme:
+                                            new InputDecorationTheme(
+                                              contentPadding:
+                                              new EdgeInsets
+                                                  .only(
+                                                  top: 16.0),
+                                            ),
+                                          ),
+                                          child: SizedBox(
+                                            height: 65.0,
+                                            child: TextFormField(
+                                              controller: businessNameController,
+                                              focusNode: _businessNameFocus,
+                                              keyboardType: TextInputType.text,
+                                              textInputAction:
+                                              TextInputAction.next,
 
-                                          //autofocus: true,
-                                          decoration: InputDecoration(
-                                            counterText: '',
-                                            //labelText: StringValues.TEXT_MOBILE_NO,
-                                            hintText:
-                                                StringValues.TEXT_MOBILE_NO,
-                                            border: InputBorder.none,
-                                            /*errorText:
-                                                                    submitFlag ? _validateEmail() : null,*/
+                                              //autofocus: true,
+                                              decoration: InputDecoration(
+                                                //contentPadding: EdgeInsets.all(0.0),
+                                                helperText: ' ',
+                                                /*prefixIcon: Padding(
+                                                  padding:
+                                                  const EdgeInsets.all(0.0),
+                                                  child: Transform.scale(
+                                                    scale: 0.65,
+                                                    child: IconButton(
+                                                      onPressed: () {},
+                                                      icon: new Image.asset(
+                                                          "assets/images/business.png"),
+                                                    ),
+                                                  ),
+                                                ),*/
+                                                prefixIcon: Container(
+                                                  width: 0,
+                                                  height: 0,
+                                                  alignment: Alignment(-0.99, 0.0),
+                                                  child: Image.asset("assets/images/business.png",width: 22,),
+                                                ),
+                                                //icon: Icon(Icons.lock_outline),
+                                                counterText: '',
+                                                //labelText: StringValues.TEXT_FIRST_NAME,
+                                                hintText: StringValues
+                                                    .TEXT_BUSINESS_NAME,
+                                                //border: InputBorder.none,
+                                                focusedBorder:
+                                                UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color:
+                                                        Colors.grey)),
+                                                /*errorText:
+                                                                                submitFlag ? _validateEmail() : null,*/
+                                              ),
+
+                                              onFieldSubmitted: (_) {
+                                                Utils.fieldFocusChange(
+                                                    context,
+                                                    _businessNameFocus,
+                                                    _businessTypeFocus);
+                                              },
+                                              validator: (String arg) {
+                                                String val =
+                                                Validation.validateTextField(
+                                                    arg);
+                                                //setState(() {
+                                                if (val != null) {
+                                                  bCompanyError = true;
+                                                  val = StringValues.bNameErrorMsg;
+                                                }
+                                                else
+                                                  bCompanyError = false;
+                                                //});
+                                                return val;
+                                              },
+                                              onChanged: (String arg) {
+                                                String val =
+                                                Validation.validateTextField(
+                                                    arg);
+                                                //setState(() {
+                                                if (val != null) {
+                                                  bCompanyError = true;
+                                                  val = StringValues.bNameErrorMsg;
+                                                }
+                                                else
+                                                  bCompanyError = false;
+                                                //});
+                                                setState(() {});
+                                              },
+                                              onSaved: (value) {
+                                                //print('email value:: $value');
+                                                _businessName = value;
+                                              },
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 0.0),
-                                    child: new Container(
-                                      height: 1.0,
-                                      color: Colors.black,
+                                      ],
                                     ),
-                                  ),
-                                  Stack(
-                                    children: <Widget>[
-                                      /*Positioned(
-                                        top: 0,
-                                        left: 0,
-                                        child: Text(
-                                          StringValues.TEXT_NEW_PASSWORD,
-                                          style: TextStyle(
-                                              color: Color(
-                                                  ColorValues.primaryColor),
-                                              fontSize: 17.0),
-                                        ),
-                                      ),*/
-                                      isPasswordError
-                                          ? Positioned(
-                                              right: 0.0,
-                                              bottom: 5.0,
-                                              //alignment: Alignment.bottomRight,
-                                              child: Image(
-                                                image: new AssetImage(
-                                                    'assets/images/error_icon_red.png'),
-                                                width: 16.0,
-                                                height: 16.0,
-                                                //fit: BoxFit.fitHeight,
+
+                                    Stack(
+                                      children: <Widget>[
+                                        /*Positioned(
+                                          top:0,
+                                          left: 0,
+                                          child: Text(StringValues.TEXT_EMAIL,style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 17.0),),),*/
+                                        bTypeError && _autoValidate
+                                            ? Positioned(
+                                          right: 0.0,
+                                          bottom: 2.0,
+                                          //alignment: Alignment.bottomRight,
+                                          child: Image(
+                                            image: new AssetImage(
+                                                'assets/images/error_icon_red.png'),
+                                            width: 17.0,
+                                            height: 17.0,
+                                            //fit: BoxFit.fitHeight,
+                                          ),
+                                        )
+                                            : Container(),
+                                        Theme(
+                                          data: Theme.of(context).copyWith(
+                                            primaryColor: Color(
+                                                ColorValues.text_view_theme),
+                                            inputDecorationTheme:
+                                            new InputDecorationTheme(
+                                              contentPadding:
+                                              new EdgeInsets
+                                                  .only(
+                                                  top: 16.0),
+                                            ),
+                                          ),
+                                          child: SizedBox(
+                                            height: 65.0,
+                                            child: TextFormField(
+                                              controller: businessTypeController,
+                                              focusNode: _businessTypeFocus,
+                                              keyboardType: TextInputType.text,
+                                              textInputAction:
+                                              TextInputAction.next,
+
+                                              //autofocus: true,
+                                              decoration: InputDecoration(
+                                                //contentPadding: EdgeInsets.all(0.0),
+                                                helperText: ' ',
+                                                /*prefixIcon: Padding(
+                                                  padding:
+                                                  const EdgeInsets.all(0.0),
+                                                  child: Transform.scale(
+                                                    scale: 0.65,
+                                                    child: IconButton(
+                                                      onPressed: () {},
+                                                      icon: new Image.asset(
+                                                          "assets/images/business.png"),
+                                                    ),
+                                                  ),
+                                                ),*/
+                                                prefixIcon: Container(
+                                                  width: 0,
+                                                  height: 0,
+                                                  alignment: Alignment(-0.99, 0.0),
+                                                  child: Image.asset("assets/images/business.png",width: 22,),
+                                                ),
+                                                //icon: Icon(Icons.lock_outline),
+                                                counterText: '',
+                                                //labelText: StringValues.TEXT_FIRST_NAME,
+                                                hintText: StringValues
+                                                    .TEXT_BUSINESS_TYPE,
+                                                //border: InputBorder.none,
+                                                focusedBorder:
+                                                UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color:
+                                                        Colors.grey)),
+                                                /*errorText:
+                                                                                submitFlag ? _validateEmail() : null,*/
                                               ),
-                                            )
-                                          : Container(),
-                                      Theme(
-                                        data: Theme.of(context).copyWith(
-                                          primaryColor: Color(
-                                              ColorValues.text_view_theme),
+
+                                              onFieldSubmitted: (_) {
+                                                Utils.fieldFocusChange(
+                                                    context,
+                                                    _businessTypeFocus,
+                                                    _brnumFocus);
+                                              },
+                                              validator: (String arg) {
+                                                String val =
+                                                Validation.validateTextField(
+                                                    arg);
+                                                //setState(() {
+                                                if (val != null) {
+                                                  bTypeError = true;
+                                                  val=StringValues.bTypeErrorMsg;
+                                                }
+                                                else
+                                                  bTypeError = false;
+                                                //});
+                                                return val;
+                                              },
+                                              onChanged: (String arg) {
+                                                String val =
+                                                Validation.validateTextField(
+                                                    arg);
+                                                //setState(() {
+                                                if (val != null) {
+                                                  bTypeError = true;
+                                                  val=StringValues.bTypeErrorMsg;
+                                                }
+                                                else
+                                                  bTypeError = false;
+                                                //});
+                                                setState(() {});
+                                              },
+                                              onSaved: (value) {
+                                                //print('email value:: $value');
+                                                _brnumber = value;
+                                              },
+                                            ),
+                                          ),
                                         ),
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 14.0),
+                                      ],
+                                    ),
+                                    Stack(
+                                      children: <Widget>[
+                                        /*Positioned(
+                                          top:0,
+                                          left: 0,
+                                          child: Text(StringValues.TEXT_EMAIL,style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 17.0),),),*/
+                                        bRegNumError && _autoValidate
+                                            ? Positioned(
+                                          right: 0.0,
+                                          bottom: 2.0,
+                                          //alignment: Alignment.bottomRight,
+                                          child: Image(
+                                            image: new AssetImage(
+                                                'assets/images/error_icon_red.png'),
+                                            width: 17.0,
+                                            height: 17.0,
+                                            //fit: BoxFit.fitHeight,
+                                          ),
+                                        )
+                                            : Container(),
+                                        Theme(
+                                          data: Theme.of(context).copyWith(
+                                            primaryColor: Color(
+                                                ColorValues.text_view_theme),
+                                            inputDecorationTheme:
+                                            new InputDecorationTheme(
+                                              contentPadding:
+                                              new EdgeInsets
+                                                  .only(
+                                                  top: 16.0),
+                                            ),
+                                          ),
+                                          child: SizedBox(
+                                            height: 65.0,
+                                            child: TextFormField(
+                                              controller: businessRegistrationNumController,
+                                              focusNode: _brnumFocus,
+                                              keyboardType: TextInputType.text,
+                                              textInputAction:
+                                              TextInputAction.next,
+
+                                              //autofocus: true,
+                                              decoration: InputDecoration(
+                                                //contentPadding: EdgeInsets.all(0.0),
+                                                helperText: ' ',
+                                                /*prefixIcon: Padding(
+                                                  padding:
+                                                  const EdgeInsets.all(0.0),
+                                                  child: Transform.scale(
+                                                    scale: 0.65,
+                                                    child: IconButton(
+                                                      onPressed: () {},
+                                                      icon: new Image.asset(
+                                                          "assets/images/business.png"),
+                                                    ),
+                                                  ),
+                                                ),*/
+                                                prefixIcon: Container(
+                                                  width: 0,
+                                                  height: 0,
+                                                  alignment: Alignment(-0.99, 0.0),
+                                                  child: Image.asset("assets/images/business.png",width: 22,),
+                                                ),
+                                                //icon: Icon(Icons.lock_outline),
+                                                counterText: '',
+                                                //labelText: StringValues.TEXT_FIRST_NAME,
+                                                hintText: StringValues
+                                                    .TEXT_BUSINESS_REGISTRATION_NUMBER,
+                                                //border: InputBorder.none,
+                                                focusedBorder:
+                                                UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color:
+                                                        Colors.grey)),
+                                                /*errorText:
+                                                                                submitFlag ? _validateEmail() : null,*/
+                                              ),
+
+                                              onFieldSubmitted: (_) {
+                                                Utils.fieldFocusChange(
+                                                    context,
+                                                    _brnumFocus,
+                                                    _emailFocus);
+                                              },
+                                              validator: (String arg) {
+                                                String val =
+                                                Validation.validateNumber(
+                                                    arg);
+                                                //setState(() {
+                                                if (val != null)
+                                                  bRegNumError = true;
+                                                else
+                                                  bRegNumError = false;
+                                                //});
+                                                return val;
+                                              },
+                                              onChanged: (String arg) {
+                                                String val =
+                                                Validation.validateNumber(
+                                                    arg);
+                                                //setState(() {
+                                                if (val != null)
+                                                  bRegNumError = true;
+                                                else
+                                                  bRegNumError = false;
+                                                //});
+                                                setState(() {
+                                                });
+                                              },
+
+                                              onSaved: (value) {
+                                                //print('email value:: $value');
+                                                _brnumber = value;
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+
+                                    Stack(
+                                      children: <Widget>[
+                                        /*Positioned(
+                                          top:0,
+                                          left: 0,
+                                          child: Text(StringValues.TEXT_EMAIL,style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 17.0),),),*/
+                                        emailError && _autoValidate
+                                            ? Positioned(
+                                          right: 0.0,
+                                          bottom: 2.0,
+                                          //alignment: Alignment.bottomRight,
+                                          child: Image(
+                                            image: new AssetImage(
+                                                'assets/images/error_icon_red.png'),
+                                            width: 17.0,
+                                            height: 17.0,
+                                            //fit: BoxFit.fitHeight,
+                                          ),
+                                        )
+                                            : Container(),
+                                        Theme(
+                                          data: Theme.of(context).copyWith(
+                                            primaryColor: Color(
+                                                ColorValues.text_view_theme),
+                                            inputDecorationTheme:
+                                            new InputDecorationTheme(
+                                              contentPadding:
+                                              new EdgeInsets
+                                                  .only(
+                                                  top: 16.0),
+                                            ),
+                                          ),
+                                          child: SizedBox(
+                                            height: 65.0,
+                                            child: TextFormField(
+                                              controller: emailController,
+                                              focusNode: _emailFocus,
+                                              keyboardType: TextInputType.emailAddress,
+                                              textInputAction:
+                                              TextInputAction.next,
+
+                                              //autofocus: true,
+                                              decoration: InputDecoration(
+                                                //contentPadding: EdgeInsets.all(0.0),
+                                                helperText: ' ',
+                                                /*prefixIcon: Padding(
+                                                  padding:
+                                                  const EdgeInsets.all(0.0),
+                                                  child: Transform.scale(
+                                                    scale: 0.65,
+                                                    child: IconButton(
+                                                      onPressed: () {},
+                                                      icon: new Image.asset(
+                                                          "assets/images/email_icon.png"),
+                                                    ),
+                                                  ),
+                                                ),*/
+                                                prefixIcon: Container(
+                                                  width: 0,
+                                                  height: 0,
+                                                  alignment: Alignment(-0.99, 0.0),
+                                                  child: Image.asset("assets/images/email_icon.png",width: 22,),
+                                                ),
+                                                //icon: Icon(Icons.lock_outline),
+                                                counterText: '',
+                                                //labelText: StringValues.TEXT_FIRST_NAME,
+                                                hintText: StringValues
+                                                    .TEXT_Email_ID,
+                                                //border: InputBorder.none,
+                                                focusedBorder:
+                                                UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color:
+                                                        Colors.grey)),
+                                                /*errorText:
+                                                                                submitFlag ? _validateEmail() : null,*/
+                                              ),
+
+                                              onFieldSubmitted: (_) {
+                                                Utils.fieldFocusChange(
+                                                    context,
+                                                    _emailFocus,
+                                                    _passwordFocus);
+                                              },
+                                              validator: (String arg) {
+                                                String val =
+                                                Validation.isEmail(arg);
+                                                //setState(() {
+                                                if (val != null)
+                                                  emailError = true;
+                                                else
+                                                  emailError = false;
+                                                //});
+                                                return val;
+                                              },
+                                              onChanged: (String arg) {
+                                                String val =
+                                                Validation.isEmail(arg);
+                                                //setState(() {
+                                                if (val != null)
+                                                  emailError = true;
+                                                else
+                                                  emailError = false;
+                                                //});
+                                                setState(() {});
+                                              },
+                                              onSaved: (value) {
+                                                //print('email value:: $value');
+                                                _email = value;
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    Stack(
+                                      children: <Widget>[
+                                        /*Positioned(
+                                          top:0,
+                                          left: 0,
+                                          child: Text(StringValues.TEXT_EMAIL,style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 17.0),),),*/
+                                        passError && _autoValidate
+                                            ? Positioned(
+                                          right: 0.0,
+                                          bottom: 2.0,
+                                          //alignment: Alignment.bottomRight,
+                                          child: Image(
+                                            image: new AssetImage(
+                                                'assets/images/error_icon_red.png'),
+                                            width: 17.0,
+                                            height: 17.0,
+                                            //fit: BoxFit.fitHeight,
+                                          ),
+                                        )
+                                            : Container(),
+                                        Theme(
+                                          data: Theme.of(context).copyWith(
+                                            primaryColor: Color(
+                                                ColorValues.text_view_theme),
+                                            inputDecorationTheme:
+                                            new InputDecorationTheme(
+                                              contentPadding:
+                                              new EdgeInsets
+                                                  .only(
+                                                  top: 16.0),
+                                            ),
+                                          ),
                                           child: SizedBox(
                                             height: 65.0,
                                             child: TextFormField(
                                               controller: passwordController,
                                               focusNode: _passwordFocus,
-
                                               keyboardType: TextInputType.text,
-                                              inputFormatters: [
-                                                BlacklistingTextInputFormatter(
-                                                    new RegExp('[\\ ]'))
-                                              ],
-                                              //to block space character
                                               textInputAction:
-                                                  TextInputAction.next,
+                                              TextInputAction.next,
+                                              obscureText: _obscureText,
+
+                                              //autofocus: true,
                                               decoration: InputDecoration(
-                                                helperText: ' ',
-                                                //labelText: StringValues.TEXT_PASSWORD,
                                                 //contentPadding: EdgeInsets.all(0.0),
-                                                //errorStyle: TextStyle(),
-                                                prefixIcon: Padding(
+                                                helperText: ' ',
+                                                /*prefixIcon: Padding(
                                                   padding:
-                                                      const EdgeInsets.only(
-                                                          left: 0.0),
+                                                  const EdgeInsets.all(0.0),
                                                   child: Transform.scale(
                                                     scale: 0.65,
                                                     child: IconButton(
@@ -374,12 +813,17 @@ class _MyProfileState extends State<MyProfile> {
                                                           "assets/images/password_ic.png"),
                                                     ),
                                                   ),
+                                                ),*/
+                                                prefixIcon: Container(
+                                                  width: 0,
+                                                  height: 0,
+                                                  alignment: Alignment(-0.99, 0.0),
+                                                  child: Image.asset("assets/images/password_ic.png",width: 22,),
                                                 ),
-                                                //icon: Icon(Icons.lock_outline),
                                                 suffixIcon: Padding(
                                                   padding:
-                                                      const EdgeInsets.only(
-                                                          right: 0.0),
+                                                  const EdgeInsets.only(
+                                                      right: 0.0),
                                                   child: Transform.scale(
                                                     scale: 0.65,
                                                     child: IconButton(
@@ -390,507 +834,193 @@ class _MyProfileState extends State<MyProfile> {
                                                     ),
                                                   ),
                                                 ),
+                                                //icon: Icon(Icons.lock_outline),
                                                 counterText: '',
-                                                hintText:
-                                                    StringValues.TEXT_PASSWORD,
-                                                //hintStyle: TextStyle(),
+                                                //labelText: StringValues.TEXT_FIRST_NAME,
+                                                hintText: StringValues
+                                                    .TEXT_PASSWORD,
                                                 //border: InputBorder.none,
                                                 focusedBorder:
-                                                    UnderlineInputBorder(
-                                                        borderSide: BorderSide(
-                                                            color:
-                                                                Colors.grey)),
+                                                UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color:
+                                                        Colors.grey)),
                                                 /*errorText:
                                                                                 submitFlag ? _validateEmail() : null,*/
                                               ),
 
-                                              obscureText: _obscureText,
-                                              onFieldSubmitted: (_) {
-                                                Utils.fieldFocusChange(
-                                                    context,
-                                                    _passwordFocus,
-                                                    _fullNameFocus);
-                                              },
+
                                               validator: (String arg) {
                                                 String val =
-                                                    Validation.validatePassword(
-                                                        arg);
+                                                Validation.validatePassword(
+                                                    arg);
                                                 //setState(() {
                                                 if (val != null)
-                                                  isPasswordError = true;
+                                                  passError = true;
                                                 else
-                                                  isPasswordError = false;
+                                                  passError = false;
                                                 //});
                                                 return val;
                                               },
-
+                                              onChanged: (String arg) {
+                                                String val =
+                                                Validation.validatePassword(
+                                                    arg);
+                                                //setState(() {
+                                                if (val != null)
+                                                  passError = true;
+                                                else
+                                                  passError = false;
+                                                //});
+                                                setState(() {});
+                                              },
                                               onSaved: (value) {
+                                                //print('email value:: $value');
                                                 _password = value;
                                               },
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  Stack(
-                                    children: <Widget>[
-                                      /*Positioned(
-                                        top:0,
-                                        left: 0,
-                                        child: Text(StringValues.TEXT_EMAIL,style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 17.0),),),*/
-                                      isNameError
-                                          ? Positioned(
-                                              right: 0.0,
-                                              bottom: 5.0,
-                                              //alignment: Alignment.bottomRight,
-                                              child: Image(
-                                                image: new AssetImage(
-                                                    'assets/images/error_icon_red.png'),
-                                                width: 16.0,
-                                                height: 16.0,
-                                                //fit: BoxFit.fitHeight,
-                                              ),
-                                            )
-                                          : Container(),
-                                      Theme(
-                                        data: Theme.of(context).copyWith(
-                                          primaryColor: Color(
-                                              ColorValues.text_view_theme),
-                                        ),
-                                        child: SizedBox(
-                                          height: 65.0,
-                                          child: TextFormField(
-                                            controller: fullNameController,
-                                            focusNode: _fullNameFocus,
-                                            keyboardType: TextInputType.text,
-                                            textInputAction:
-                                                TextInputAction.next,
-
-                                            //autofocus: true,
-                                            decoration: InputDecoration(
-                                              //contentPadding: EdgeInsets.all(0.0),
-                                              helperText: ' ',
-                                              prefixIcon: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(0.0),
-                                                child: Transform.scale(
-                                                  scale: 0.65,
-                                                  child: IconButton(
-                                                    onPressed: () {},
-                                                    icon: new Image.asset(
-                                                        "assets/images/name_icon.png"),
-                                                  ),
-                                                ),
-                                              ),
-                                              //icon: Icon(Icons.lock_outline),
-                                              counterText: '',
-                                              //labelText: StringValues.TEXT_FIRST_NAME,
-                                              hintText: StringValues
-                                                  .TEXT_FIRST_NAME,
-                                              //border: InputBorder.none,
-                                              focusedBorder:
-                                                  UnderlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                          color:
-                                                              Colors.grey)),
-                                              /*errorText:
-                                                                              submitFlag ? _validateEmail() : null,*/
-                                            ),
-
-                                            onFieldSubmitted: (_) {
-                                              Utils.fieldFocusChange(
-                                                  context,
-                                                  _fullNameFocus,
-                                                  _emailFocus);
-                                            },
-                                            validator: (String arg) {
-                                              String val =
-                                                  Validation.validateName(
-                                                      arg);
-                                              //setState(() {
-                                              if (val != null)
-                                                isNameError = true;
-                                              else
-                                                isNameError = false;
-                                              //});
-                                              return val;
-                                            },
-                                            onSaved: (value) {
-                                              //print('email value:: $value');
-                                              _fullName = value;
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Stack(
-                                    children: <Widget>[
-                                      /*Positioned(
-                                        top:0,
-                                        left: 0,
-                                        child: Text(StringValues.TEXT_EMAIL,style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 17.0),),),*/
-                                      isEmailError
-                                          ? Positioned(
-                                              right: 0.0,
-                                              bottom: 5.0,
-                                              //alignment: Alignment.bottomRight,
-                                              child: Image(
-                                                image: new AssetImage(
-                                                    'assets/images/error_icon_red.png'),
-                                                width: 16.0,
-                                                height: 16.0,
-                                                //fit: BoxFit.fitHeight,
-                                              ),
-                                            )
-                                          : Container(),
-                                      Theme(
-                                        data: Theme.of(context).copyWith(
-                                          primaryColor: Color(
-                                              ColorValues.text_view_theme),
-                                        ),
-                                        child: SizedBox(
-                                          height: 65.0,
-                                          child: TextFormField(
-                                            controller: emailController,
-                                            focusNode: _emailFocus,
-                                            keyboardType:
-                                                TextInputType.emailAddress,
-                                            textInputAction:
-                                                TextInputAction.next,
-
-                                            //autofocus: true,
-                                            decoration: InputDecoration(
-                                              //contentPadding: EdgeInsets.all(0.0),
-                                              helperText: ' ',
-                                              prefixIcon: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(0.0),
-                                                child: Transform.scale(
-                                                  scale: 0.65,
-                                                  child: IconButton(
-                                                    onPressed: () {},
-                                                    icon: new Image.asset(
-                                                        "assets/images/email_icon.png"),
-                                                  ),
-                                                ),
-                                              ),
-                                              //icon: Icon(Icons.lock_outline),
-                                              counterText: '',
-                                              //labelText: StringValues.TEXT_EMAIL,
-                                              hintText:
-                                                  StringValues.TEXT_EMAIL,
-                                              //border: InputBorder.none,
-                                              focusedBorder:
-                                                  UnderlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                          color:
-                                                              Colors.grey)),
-                                              /*errorText:
-                                                                              submitFlag ? _validateEmail() : null,*/
-                                            ),
-
-                                            onFieldSubmitted: (_) {
-                                              Utils.fieldFocusChange(context,
-                                                  _emailFocus, _addressFocus);
-                                            },
-                                            validator: (String arg) {
-                                              String val =
-                                                  Validation.isEmail(arg);
-                                              //setState(() {
-                                              if (val != null)
-                                                isEmailError = true;
-                                              else
-                                                isEmailError = false;
-                                              //});
-                                              return val;
-                                            },
-                                            onSaved: (value) {
-                                              //print('email value:: $value');
-                                              _email = value;
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  /*   Row(
-                                    children: <Widget>[
-                                      Image(
-                                        image: new AssetImage(
-                                            'assets/images/email_icon.png'),
-                                        width: 16.0,
-                                        height: 16.0,
-                                        //fit: BoxFit.fitHeight,
-                                      ),
-                                      Container(width: 12.0,),
-                                      Expanded(
-                                        child: TextFormField(
-                                          controller: emailController,
-                                          focusNode: _emailFocus,
-                                          keyboardType: TextInputType.emailAddress,
-                                          */ /*inputFormatters: [
-                                          WhitelistingTextInputFormatter.digitsOnly,
-                                          // Fit the validating format.
-                                          //_phoneNumberFormatter,
-                                        ],*/ /*
-                                          //to block space character
-                                          textInputAction: TextInputAction.next,
-
-                                          //autofocus: true,
-                                          decoration: InputDecoration(
-                                            labelText: StringValues.TEXT_EMAIL,
-                                            hintText: StringValues.TEXT_EMAIL,
-                                            border: InputBorder.none,
-                                            */ /*errorText:
-                                                                    submitFlag ? _validateEmail() : null,*/ /*
-                                          ),
-                                          onFieldSubmitted: (_) {
-                                            Utils.fieldFocusChange(
-                                                context, _emailFocus, _addressFocus);
-                                          },
-                                          validator: Validation.isEmail,
-                                          onSaved: (value) {
-                                            _email = value;
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 0.0),
-                                    child: new Container(
-                                      height: 1.0,
-                                      color: Colors.grey,
-                                      ),
-                                  ),*/
-                                  Stack(
-                                    children: <Widget>[
-                                      /*Positioned(
-                                        top:0,
-                                        left: 0,
-                                        child: Text(StringValues.TEXT_EMAIL,style: TextStyle(color: Color(ColorValues.primaryColor),fontSize: 17.0),),),*/
-                                      isAddressError
-                                          ? Positioned(
-                                              right: 0.0,
-                                              bottom: 5.0,
-                                              //alignment: Alignment.bottomRight,
-                                              child: Image(
-                                                image: new AssetImage(
-                                                    'assets/images/error_icon_red.png'),
-                                                width: 16.0,
-                                                height: 16.0,
-                                                //fit: BoxFit.fitHeight,
-                                              ),
-                                            )
-                                          : Container(),
-                                      Theme(
-                                        data: Theme.of(context).copyWith(
-                                          primaryColor: Color(
-                                              ColorValues.text_view_theme),
-                                        ),
-                                        child: SizedBox(
-                                          height: 65.0,
-                                          child: TextFormField(
-                                            controller: addressController,
-                                            focusNode: _addressFocus,
-                                            keyboardType: TextInputType.text,
-                                            textInputAction:
-                                                TextInputAction.done,
-
-                                            //autofocus: true,
-                                            decoration: InputDecoration(
-                                              //contentPadding: EdgeInsets.all(0.0),
-                                              helperText: ' ',
-                                              prefixIcon: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(0.0),
-                                                child: Transform.scale(
-                                                  scale: 0.65,
-                                                  child: IconButton(
-                                                    onPressed: () {},
-                                                    icon: new Image.asset(
-                                                        "assets/images/location_ic.png"),
-                                                  ),
-                                                ),
-                                              ),
-                                              //icon: Icon(Icons.lock_outline),
-                                              counterText: '',
-                                              //labelText: StringValues.TEXT_ADDRESS,
-                                              hintText:
-                                                  StringValues.TEXT_ADDRESS,
-                                              //border: InputBorder.none,
-                                              focusedBorder:
-                                                  UnderlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                          color:
-                                                              Colors.grey)),
-                                              /*errorText:
-                                                                              submitFlag ? _validateEmail() : null,*/
-                                            ),
-
-                                            onFieldSubmitted: (_) {
-                                              _addressFocus.unfocus();
-                                              validateMyProfile();
-                                            },
-                                            validator: (String arg) {
-                                              String val =
-                                                  Validation.validateAddress(
-                                                      arg);
-                                              //setState(() {
-                                              if (val != null)
-                                                isAddressError = true;
-                                              else
-                                                isAddressError = false;
-                                              //});
-                                              return val;
-                                            },
-                                            onSaved: (value) {
-                                              //print('email value:: $value');
-                                              _address = value;
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  /*Row(
-                                    children: <Widget>[
-                                      Image(
-                                        image: new AssetImage(
-                                            'assets/images/location_ic.png'),
-                                        width: 16.0,
-                                        height: 16.0,
-                                        //fit: BoxFit.fitHeight,
-                                      ),
-                                      Container(width: 12.0,),
-                                      Expanded(
-                                        child: TextFormField(
-                                          controller: addressController,
-                                          focusNode: _addressFocus,
-                                          keyboardType: TextInputType.multiline,
-                                          maxLines: null,
-                                          */ /*inputFormatters: [
-                                WhitelistingTextInputFormatter.digitsOnly,
-                                // Fit the validating format.
-                                _phoneNumberFormatter,
-                              ],*/ /*
-                                          //to block space character
-                                          textInputAction: TextInputAction.done,
-
-                                          //autofocus: true,
-                                          decoration: InputDecoration(
-                                            labelText: StringValues.TEXT_ADDRESS,
-                                            hintText: StringValues.TEXT_ADDRESS,
-                                            border: InputBorder.none,
-                                            */ /*errorText:
-                                                                    submitFlag ? _validateEmail() : null,*/ /*
-                                          ),
-                                          onFieldSubmitted: (value) {
-                                            _addressFocus.unfocus();
-                                            validateMyProfile();
-                                          },
-                                          validator: Validation.validateAddress,
-                                          onSaved: (value) {
-                                            _address = value;
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 15.0),
-                                    child: new Container(
-                                      height: 1.0,
-                                      color: Colors.grey,
+                                      ],
                                     ),
-                                  ),*/
-                                  Container(
-                                    height: 10.0,
-                                  ),
-                                  GestureDetector(
-                                    onTap: () async {
-                                      String currentLocation = await new Utils()
-                                          .getUserLocationNew();
-                                      setState(() {
-                                        addressController.text =
-                                            currentLocation;
-                                      });
-                                    },
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
+
+                              /*      Padding(
+                                        padding: const EdgeInsets.only(
+                                            bottom: 5.0, top: 10.0)),
+                                    Row(
                                       children: <Widget>[
-                                        Image(
-                                          image: new AssetImage(
-                                              'assets/images/location_yello.png'),
-                                          width: 20.0,
-                                          height: 20.0,
-                                          //fit: BoxFit.cover,
-                                        ),
+                                        new Image.asset("assets/images/check.png",width: 20,height: 20,),
                                         Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 8.0),
-                                          child: Text(
-                                            StringValues.TEXT_USE_CUR_LOC,
+                                          padding: const EdgeInsets.only(left: 5.0),
+                                          child: new Text(StringValues.TEXT_I_AGREE_TO,
                                             style: TextStyle(
-                                              color: Color(
-                                                  ColorValues.primaryColor),
-                                              fontSize: 15.0,
-                                              fontFamily:
-                                                  StringValues.customLight,
+                                                color: Color(ColorValues.text_view_hint),
+                                                fontSize: 16.0
                                             ),
+                                          ),
+                                        ),
+                                        new Text(StringValues.TEXT_TERM_AND_CONDITION,
+                                          style: TextStyle(
+                                              decoration:TextDecoration.underline ,
+                                              color: Color(ColorValues.text_view_hint),
+                                              fontSize: 16.0
                                           ),
                                         )
                                       ],
+                                    ),*/
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.start,
+                                      mainAxisSize:
+                                      MainAxisSize.max,
+                                      children: <Widget>[
+
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _checkedValue =
+                                              !_checkedValue;
+                                            });
+                                          },
+                                          child: Image(
+                                            image: _checkedValue
+                                                ? new AssetImage(
+                                                'assets/images/select_grey.png')
+                                                : new AssetImage(
+                                                'assets/images/unselect_grey.png'),
+                                            width: 26.0,
+                                            height: 26.0,
+                                            //fit: BoxFit.fitHeight,
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Padding(
+                                            padding:
+                                            const EdgeInsets
+                                                .only(
+                                                left: 8.0),
+                                            child: Row(
+                                              children: <Widget>[
+                                                Text(
+                                                  StringValues
+                                                      .i_agree_to,
+                                                  style: TextStyle(
+                                                      color: Color(
+                                                          ColorValues
+                                                              .text_view_hint),
+                                                      fontSize:
+                                                      14.0),
+                                                ),
+                                                Text(
+                                                  StringValues
+                                                      .t_n_c,
+                                                  style: TextStyle(
+                                                      decoration:
+                                                      TextDecoration
+                                                          .underline,
+                                                      color: Color(
+                                                          ColorValues
+                                                              .text_view_hint),
+                                                      fontSize:
+                                                      14.0),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  Padding(
-                                      padding: const EdgeInsets.only(
-                                          bottom: 30.0, top: 15.0)),
-                                  SizedBox(
-                                    width: 250.0,
-                                    height: 52.0,
-                                    child: RaisedButton(
-                                      shape: new RoundedRectangleBorder(
-                                          borderRadius:
-                                              new BorderRadius.circular(30.0),
-                                          side: BorderSide(
-                                              color: Color(
-                                                  ColorValues.yellow_light))),
-                                      onPressed: () {
-                                        validateMyProfile();
-                                        //getAlertDialog(context);
-                                      },
-                                      color: Color(ColorValues.yellow_light),
-                                      textColor: Colors.white,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(10.0),
-                                        child: Text(
-                                            StringValues.TEXT_SUBMIT
-                                                .toUpperCase(),
-                                            style: TextStyle(fontSize: 20)),
+                                    Padding(
+                                        padding: const EdgeInsets.only(
+                                            bottom: 30.0, top: 10.0)),
+                                    SizedBox(
+                                      width: 250.0,
+                                      height: 52.0,
+                                      child: RaisedButton(
+                                        shape: new RoundedRectangleBorder(
+                                            borderRadius:
+                                            new BorderRadius.circular(30.0),
+                                            side: BorderSide(
+                                                color: Color(
+                                                    ColorValues.primaryColor))),
+                                        onPressed: () {
+                                          validateMyProfile();
+                                          //getAlertDialog(context);
+                                        },
+                                        color: Color(ColorValues.primaryColor),
+                                        textColor: Colors.white,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Text(
+                                              StringValues.TEXT_SUBMIT
+                                                  .toUpperCase(),
+                                              style: TextStyle(fontSize: 20)),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              _isInProgress ? CommonWidgets.getLoader(context) : Container(),
-              //WillPopScope(child: Container(), onWillPop: onBackPressed),
-            ],
+                  ],
+                ),
+                _isInProgress ? CommonWidgets.getLoader(context) : Container(),
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  void _navigateToRegistration() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Registration()),
     );
   }
 
@@ -1007,9 +1137,9 @@ class _MyProfileState extends State<MyProfile> {
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(18.0),
                         side:
-                            BorderSide(color: Color(ColorValues.yellow_light))),
+                        BorderSide(color: Color(ColorValues.accentColor))),
                     onPressed: () {},
-                    color: Color(ColorValues.yellow_light),
+                    color: Color(ColorValues.accentColor),
                     textColor: Colors.white,
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
@@ -1066,32 +1196,43 @@ class _MyProfileState extends State<MyProfile> {
     setState(() {
       _isInProgress = true;
     });
-    print('widget.userId::: ${widget.userId}');
+
+/*    {
+      "businessName": "string",
+    "businessRegistrationNumber": "string",
+    "businessType": "string",
+    "email": "string",
+    "password": "string",
+    "timezone": "string",
+    "userId": 0
+    }*/
+
+
+
     Map<String, dynamic> requestJson = {
-      "address": _address,
-      "email": _email,
-      "name": _fullName,
-      "password": Utils.encodeStringToBase64(_password),
+      "businessName": businessNameController.text,
+      "businessRegistrationNumber": businessRegistrationNumController.text,
+      "businessType": businessTypeController.text,
+      "email" : emailController.text,
       "timezone": "GMT+5:30",
-      "userId": widget.userId
+      "password":  Utils.encodeStringToBase64(passwordController.text),
+      "userId": widget.userId,
+      "latitude":latitude,
+      "longitude":longitude,
+      "isAgree": _checkedValue
     };
-    /* Map<String, dynamic> requestJson = {
-      "address": addressController.text.trim(),
-      "email": emailController.text.trim(),
-      "name": fullNameController.text.trim(),
-      "password": passwordController.text.trim(),
-      "timezone": "GMT+5:30",
-      "userId": widget.userId
-    };*/
+
     print("requestJson::: ${requestJson}");
-    String access_token = await SharedPreferencesHelper.getPrefString(
-        SharedPreferencesHelper.ACCESS_TOKEN);
     //Map<String, dynamic> requestJson1 = {"mobile": "7000543895"};
+    String access_token= await SharedPreferencesHelper.getPrefString(SharedPreferencesHelper.ACCESS_TOKEN);
+
+
     Map<String, String> headers = {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Authorization': 'bearer $access_token'
     };
+
     String dataURL =
         Constants.BASE_URL + Constants.REGISTRATION_PROFILE_STEP2_API;
     print("Profile URL::: $dataURL");
@@ -1111,23 +1252,19 @@ class _MyProfileState extends State<MyProfile> {
       //final jsonResponse = json.decode(response.body);
       print('jsonResponse::::: ${jsonResponseMap.toString()}');
       //ResponsePodo responsePodo = new ResponsePodo.fromJson(jsonResponseMap);
-      APIResponse apiResponse = new APIResponse.fromJson(jsonResponseMap);
+      ResponsePodo apiResponse = new ResponsePodo.fromJson(jsonResponseMap);
       print("apiResponse.responseMessage:: ${apiResponse.responseMessage}");
 
       if (response.statusCode == 200) {
         print("statusCode 200....");
-        if (apiResponse.resourceData == null && apiResponse.status == 200) {
+        if (apiResponse.status == 200) {
           //.isRegistrationComplete == "false"){
           //_navigateToRegistrationOtp();
           print("Registration Successfull!!!");
-          /*Toast.show("Registration Successfull!!!", context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);*/
+          Toast.show("Registration Successfull!!!", context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
           //_navigateToLogin();
           //callLoginApi();
-
-          SharedPreferencesHelper.setPrefString(
-              SharedPreferencesHelper.NAME, _fullName);
-
           _performLogin();
         } else if (apiResponse.status == 500) {
           print(apiResponse.message);
@@ -1140,7 +1277,7 @@ class _MyProfileState extends State<MyProfile> {
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       } else {
         print("statusCode error....");
-        Toast.show("statusCode error....", context,
+        Toast.show(apiResponse.message, context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       }
     } on SocketException catch (e) {
@@ -1161,34 +1298,30 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
-  Future _performLogin() async {
-    // This is just a demo, so no actual login here.
-    //_saveLoginState();
-    //if(widget.from == 'Dashboard'){
-    SharedPreferencesHelper.setPrefBool(
-        SharedPreferencesHelper.IS_PROFILE_COMPLETE, true);
-    //}
+  /*void _navigateToLogin() {
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil('/loginOptions', (Route<dynamic> route) => false);
+  }*/
 
-    /*final result =
-    await Navigator.of(context).pushReplacementNamed('/dashboard');*/
-    return Navigator.of(context)
-        .pushNamedAndRemoveUntil('/dashboard', (Route<dynamic> route) => false);
-
-    /*final resultData = await Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => Dashboard()),
-    );*/
-    print('_performLogin belo push');
-    //Navigator.of(context).pop(Constants.popScreen);
-    print('_performLogin belo pop');
-  }
+  /* void fieldFocusChange(BuildContext context, FocusNode currentFocus,
+      FocusNode nextFocus) {
+    currentFocus.unfocus();
+    FocusScope.of(context).requestFocus(nextFocus);
+  }*/
 
   void _validateInputs() {
     if (_formKey.currentState.validate()) {
 //    If all data are correct then save data to out variables
       _formKey.currentState.save();
       //Toast.show("All feild are valid....", context, duration: Toast.LENGTH_LONG);
-      callMyProfileApi();
+      //callMyProfileApi();
+      if (_checkedValue) {
+        callMyProfileApi();
+      } else {
+        Toast.show(StringValues.TEXT_PLEASE_ACCEPT, context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        _isSubmitPressed = false;
+      }
     } else {
 //    If all data are not valid then start auto validation.
       setState(() {
@@ -1198,48 +1331,80 @@ class _MyProfileState extends State<MyProfile> {
       //Toast.show("Some feilds are not valid....", context, duration: Toast.LENGTH_LONG);
     }
   }
+  Future<String> getUserLocationNew() async {
+//call this async method from whereever you need
+    print("getUserLocationNew()");
+    String address = "";
+    LocationData myLocation;
+    String error;
+    Location location = new Location();
+    try {
+      myLocation = await location.getLocation();
+    } on PlatformException catch (e) {
+      if (e.code == 'PERMISSION_DENIED') {
+        error = 'please grant permission';
+        print(error);
+      }
+      if (e.code == 'PERMISSION_DENIED_NEVER_ASK') {
+        error = 'permission denied- please enable it from app settings';
+        print(error);
+      }
+      myLocation = null;
+    }
+    var currentLocation = myLocation;
+    final coordinates =
+    new Coordinates(myLocation.latitude, myLocation.longitude);
+     latitude=myLocation.latitude;
+     longitude=myLocation.longitude;
+    print("latitude---"+myLocation.latitude.toString());
+    var addresses =
+    await Geocoder.local.findAddressesFromCoordinates(coordinates);
+    var first = addresses.first;
+    print(
+        ' ${first.locality}, ${first.adminArea},${first.subLocality}, ${first.subAdminArea},${first.addressLine}, ${first.featureName},${first.thoroughfare}, ${first.subThoroughfare}');
 
-  Future<bool> onBackPressed() async {
-    print('onBackPressed called');
-    //Navigator.of(context).pop(Constants.popScreen);
-    /*final resultData = await Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoginOptions()),
-    );*/
-    return true;
+    address =
+    '${first.addressLine},${first.featureName},${first.subAdminArea},${first.adminArea}';
+    print('Address:: $address');
+    return address;
   }
-/*void callLoginApi() async {
+
+  void callLoginApi() async {
     String encodedPassword = Utils.encodeStringToBase64(_password);
     print("login _password::: $_password \n_email:: $_email \n_countryCode::: ${widget.countryCode} ");
     print("login encodedPassword::: $encodedPassword");
-    if (!mounted) return;
+    /*  if (!mounted) return;
     setState(() {
       _isInProgress = true;
-    });
-    Map<String, dynamic> requestJson = {
-      //"username": _email,
-      //"password": password//,
-      //"deviceToken": deviceToken
-    };
+    })*/;
+
+    String access_token= await SharedPreferencesHelper.getPrefString(SharedPreferencesHelper.ACCESS_TOKEN);
+
 //http://103.76.253.133:8751/userauth/oauth/token?grant_type=password&username=1234567890&password=ZHVtbXkxMjM=&countryCode=91&roleId=2
     Map<String, String> headers = {
       'Content-type': 'application/json',
       'Accept': 'application/json',
+      'Authorization': 'bearer $access_token'
     };
+    print(headers);
+    String email="abcd@yopmail.com";
     String dataURL = Constants.BASE_URL +
         Constants.LOGIN_API +
         //"?grant_type=password&username=1234567890&password=ZHVtbXkxMjM=&countryCode=91&roleId=2";
-        '?grant_type=password&username=$_email&password=$encodedPassword&countryCode=${widget.countryCode}&roleId=${Constants.ROLE_ID}&loginBy=${Constants.loginByEmail}';
+        '?grant_type=password&username=$email&password=$encodedPassword&countryCode=${widget.countryCode}&roleId=${Constants.ROLE_ID}&loginBy=${Constants.loginByEmail}';
     //"?grant_type=password&username=$_email&password=$encodedPassword&countryCode=$_countryCode&roleId=${Constants.ROLE_ID}&loginBy=${Constants.loginByMobile}";
+    print(dataURL);
     try {
       http.Response response = await http.post(dataURL,
-          headers: headers, body: json.encode(requestJson));
+          headers: headers);
+
 
       //if (!mounted) return;
       setState(() {
         _isInProgress = false;
       });
       _isSubmitPressed = false;
+      print("response::: ${response.body}");
 
       if (response.statusCode == 200) {
         print("statusCode 200....");
@@ -1278,6 +1443,8 @@ class _MyProfileState extends State<MyProfile> {
           SharedPreferencesHelper.setPrefBool(
               SharedPreferencesHelper.IS_ACTIVE, loginResponse.isActive);
           SharedPreferencesHelper.setPrefBool(
+              SharedPreferencesHelper.isNewLogin, loginResponse.isNewLogin);
+          SharedPreferencesHelper.setPrefBool(
               SharedPreferencesHelper.IS_PROFILE_COMPLETE,
               loginResponse.isProfileComplete);
           SharedPreferencesHelper.setPrefString(
@@ -1297,7 +1464,9 @@ class _MyProfileState extends State<MyProfile> {
       } else if (response.statusCode == 401) {
         Toast.show(StringValues.ERROR_LOGIN_NOT_REGISTERED, context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-      } else {
+      }
+
+      else {
         print("statusCode error....");
         Toast.show("error code::: ${response.statusCode}", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
@@ -1320,5 +1489,49 @@ class _MyProfileState extends State<MyProfile> {
       });
       _isSubmitPressed = false;
     }
-  }*/
+  }
+  Future _performLogin() async {
+    // This is just a demo, so no actual login here.
+    //_saveLoginState();
+    //if(widget.from == 'Dashboard'){
+    SharedPreferencesHelper.setPrefBool(
+        SharedPreferencesHelper.IS_REGISTRATION_COMPLETE, true);
+    //}
+
+    /*final result =
+    await Navigator.of(context).pushReplacementNamed('/dashboard');*/
+    return Navigator.of(context)
+        .pushNamedAndRemoveUntil('/dashboard', (Route<dynamic> route) => false);
+
+    /*final resultData = await Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Dashboard()),
+    );*/
+    print('_performLogin belo push');
+    //Navigator.of(context).pop(Constants.popScreen);
+    print('_performLogin belo pop');
+  }
+
+  Future<bool> _onBackPressed() async {
+    final TwoButtonSelection action = await new CustomAlertDialog()
+        .getTwoBtnAlertDialog(context, StringValues.TEXT_GOBACK_MESSAGE,
+        StringValues.TEXT_NO, StringValues.TEXT_YES, '');
+    if (action == TwoButtonSelection.Second) {
+      //Navigator.of(context).pop();
+      return true;
+    }else {
+      //Navigator.of(context).pop(false);
+      return false;
+    }
+  }
+
+  Future confirmBack() async {
+
+    final TwoButtonSelection action = await new CustomAlertDialog()
+        .getTwoBtnAlertDialog(context, StringValues.TEXT_GOBACK_MESSAGE,
+        StringValues.TEXT_NO, StringValues.TEXT_YES, '');
+    if (action == TwoButtonSelection.Second) {
+      Navigator.pop(context);
+    }
+  }
 }

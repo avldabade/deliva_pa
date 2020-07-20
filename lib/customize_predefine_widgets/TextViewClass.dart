@@ -1,6 +1,6 @@
-import 'package:deliva/services/utils.dart';
-import 'package:deliva/values/ColorValues.dart';
-import 'package:deliva/values/StringValues.dart';
+import 'package:deliva_pa/services/utils.dart';
+import 'package:deliva_pa/values/ColorValues.dart';
+import 'package:deliva_pa/values/StringValues.dart';
 import 'package:flutter/material.dart';
 
 class TextViewClass{

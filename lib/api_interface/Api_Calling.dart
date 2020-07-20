@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:deliva/services/UserPreferences.dart';
+import 'package:deliva_pa/services/UserPreferences.dart';
+import 'package:deliva_pa/services/shared_preference_helper.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:path/path.dart';
@@ -74,9 +75,12 @@ class APICalling {
   static Future<String> getapiRequestWithAccessToken(
       String url, BuildContext context) async {
     HttpClient httpClient = new HttpClient();
+    String access_token = await SharedPreferencesHelper.getPrefString(
+        SharedPreferencesHelper.ACCESS_TOKEN);
     HttpClientRequest request = await httpClient.getUrl(Uri.parse(url));
-    request.headers.set('content-type', 'application/json');
-    request.headers.set('accessToken', UserPreference.getAccessToken());
+    request.headers.set('Content-type', 'application/json');
+    request.headers.set('Accept-type', 'application/json');
+    request.headers.set('Authorization', "bearer"+access_token);
      HttpClientResponse response = await request.close();
 
     print(response.statusCode);

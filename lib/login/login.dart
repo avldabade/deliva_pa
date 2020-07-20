@@ -1,16 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:deliva/forgot_password/forgot_password.dart';
-import 'package:deliva/podo/login_response.dart';
-import 'package:deliva/podo/response_podo.dart';
-import 'package:deliva/registration/registration.dart';
-import 'package:deliva/services/common_widgets.dart';
-import 'package:deliva/services/shared_preference_helper.dart';
-import 'package:deliva/services/utils.dart';
-import 'package:deliva/services/validation_textfield.dart';
-import 'package:deliva/values/ColorValues.dart';
-import 'package:deliva/values/StringValues.dart';
+import 'package:deliva_pa/forgot_password/forgot_password.dart';
+import 'package:deliva_pa/podo/login_response.dart';
+import 'package:deliva_pa/podo/response_podo.dart';
+import 'package:deliva_pa/registration/registration.dart';
+import 'package:deliva_pa/services/common_widgets.dart';
+import 'package:deliva_pa/services/shared_preference_helper.dart';
+import 'package:deliva_pa/services/utils.dart';
+import 'package:deliva_pa/services/validation_textfield.dart';
+import 'package:deliva_pa/values/ColorValues.dart';
+import 'package:deliva_pa/values/StringValues.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:toast/toast.dart';
@@ -245,7 +245,7 @@ class _LoginState extends State<Login> {
                                                         alignLeft: false,
                                                         padding:
                                                             EdgeInsets.all(0),
-                                                        flagWidth: 25.0,
+                                                        //flagWidth: 25.0,
                                                         //Get the country information relevant to the initial selection
                                                         onInit: (code) {
                                                           print(
@@ -383,7 +383,7 @@ class _LoginState extends State<Login> {
                                                           icon: Image.asset(_obscureText
                                                               ? 'assets/images/eye.png'
                                                               : 'assets/images/eye_cross.png'),
-                                                          //color:Color(ColorValues.yellow_light),
+                                                          //color:Color(ColorValues.accentColor),
                                                           //iconSize: 24.0,
                                                         ),
                                                       )
@@ -465,13 +465,13 @@ class _LoginState extends State<Login> {
                                                           side: BorderSide(
                                                               color: Color(
                                                                   ColorValues
-                                                                      .yellow_light))),
+                                                                      .accentColor))),
                                                       onPressed: () {
                                                         print("Login....");
                                                         validateLogin();
                                                       },
                                                       color: Color(ColorValues
-                                                          .yellow_light),
+                                                          .accentColor),
                                                       textColor: Colors.white,
                                                       child: Padding(
                                                         padding:
